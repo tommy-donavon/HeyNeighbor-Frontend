@@ -8,6 +8,7 @@ import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
 import FileUpload from 'primevue/fileupload';
+import Dropdown from 'primevue/dropdown';
 
 createApp(App)
   .use(store)
@@ -22,4 +23,5 @@ createApp(App)
   .component('Password', Password)
   .component('Button', Button)
   .component('FileUpload', FileUpload)
+  .component('Dropdown', Dropdown)
   .mount('#app');

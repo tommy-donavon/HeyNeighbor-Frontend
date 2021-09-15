@@ -1,6 +1,8 @@
+const baseURL = 'http://localhost:8080/api/account/';
+
 export default {
      getToken: async (username, password) => {
-        const response = await fetch('http://localhost:8080/api/account/', {
+        const response = await fetch(baseURL, {
             method:"POST",
             headers: {
                 accept: 'application/json',
@@ -19,7 +21,7 @@ export default {
 
     },
     getUserInformation: async (token) => {
-        const response = await fetch('http://localhost:8080/api/account/', {
+        const response = await fetch(baseURL, {
             headers: {
                 accept: 'application/json',
                 Authorization: `Bearer ${token}`
@@ -32,5 +34,21 @@ export default {
             throw error;
         }
         return data;
+    },
+    createUserAccount: async (userInformation) => {
+        const response = await fetch(`${baseURL}create-admin`, {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(userInformation)
+        });
+        if(!response.ok){
+            var data = await response.json()
+            const error = new Error(data.message || `Failed to create user`)
+            error.response = data
+            throw error;
+        }
     }
+
 }

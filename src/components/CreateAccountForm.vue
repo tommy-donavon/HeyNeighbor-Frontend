@@ -16,6 +16,29 @@
       />
       <label for="verify-password">Please Verify Password</label>
     </span>
+    <span class="p-float-label">
+      <InputText id="firstName" v-model="firstnameValue" />
+      <label for="firstName">First Name</label>
+    </span>
+    <span class="p-float-label">
+      <InputText id="lastName" v-model="lastnameValue" />
+      <label for="lastName">Last Name</label>
+    </span>
+    <span class="p-float-label">
+      <InputText id="email" v-model="emailValue" />
+      <label for="email">email</label>
+    </span>
+    <span class="p-float-label">
+      <InputText id="phoneNumber" v-model="phoneValue" />
+      <label for="phoneNumber">Phone Number</label>
+    </span>
+    <Dropdown
+      v-model="selectedUserType"
+      :options="userOptions"
+      optionLabel="type"
+      placeholder="Select User Type"
+    />
+
     <Button
       label="submit"
       ref="submitBTN"
@@ -27,31 +50,77 @@
   </div>
 </template>
 
-//TODO add profile pic support //TODO add support to check for already used
-username
+//TODO add profile pic support //TODO check for already used username
+//TODO better error feedback
 <script>
 import { ref, watchEffect } from 'vue';
+import userClient from '@/clients/userClient.js';
 
 export default {
   setup() {
     const usernameValue = ref('');
     const passwordValue = ref('');
     const verifyPasswordValue = ref('');
+    const firstnameValue = ref('');
+    const lastnameValue = ref('');
+    const emailValue = ref('');
+    const phoneValue = ref('');
+    const selectedUserType = ref('');
     const isReady = ref(false);
-    const onSubmit = () => {};
+    const onSubmit = async () => {
+      const userInformation = {
+        username: usernameValue.value,
+        password: passwordValue.value,
+        first_name: firstnameValue.value,
+        last_name: lastnameValue.value,
+        email: emailValue.value,
+        phone_number: phoneValue.value,
+        account_type: Number(selectedUserType.value.value),
+        user_status: 1,
+      };
+      try {
+        await userClient.createUserAccount(userInformation);
+      } catch (err) {
+        console.error(err);
+      }
+    };
     watchEffect(() => {
-        isReady.value = !(verifyPasswordValue.value === passwordValue.value && verifyPasswordValue.value.length > 0 && passwordValue.value.length > 0)
-    })
+      var validUserName = usernameValue.value.length > 0;
+      var validPasswordValue = passwordValue.value.length > 0;
+      var matchPass = passwordValue.value === verifyPasswordValue.value;
+      var validName =
+        firstnameValue.value.length > 0 && lastnameValue.value.length > 0;
+      var validEmail = emailValue.value.length > 0;
+      var validPhone = phoneValue.value.length > 0;
+      var validUserType = selectedUserType.value.value !== undefined;
+
+      isReady.value = !(
+        validUserName &&
+        validPasswordValue &&
+        matchPass &&
+        validName &&
+        validEmail &&
+        validPhone &&
+        validUserType
+      );
+    });
     return {
       usernameValue,
       passwordValue,
       verifyPasswordValue,
       onSubmit,
       isReady,
-    
+      firstnameValue,
+      lastnameValue,
+      emailValue,
+      phoneValue,
+      selectedUserType,
+      userOptions: [
+        { type: 'Propery-Manager/Landlord', value: 0 },
+        { type: 'Tenant', value: 1 },
+      ],
     };
   },
-
 };
 </script>
 
