@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+// import Chat from '../views/Chat.vue'
 
 const routes = [
   {
@@ -7,7 +8,12 @@ const routes = [
     name: 'Home',
     component: Home
   },
-]
+  {
+    path: '/chat',
+    name: 'Chat',
+    component: () => import(/* webpackChunkName: "chat" */'../views/Chat.vue')
+
+  },
   // {
   //   path: '/about',
   //   name: 'About',
@@ -16,6 +22,7 @@ const routes = [
   //   // which is lazy-loaded when the route is visited.
   //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   // }
+]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),

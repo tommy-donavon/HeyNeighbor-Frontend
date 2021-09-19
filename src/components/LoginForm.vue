@@ -8,7 +8,7 @@
       <Password id="password" v-model="passwordValue" toogleMask></Password>
       <label for="password">Password</label>
     </span>
-    <Button label="submit" @click="onSubmit({username:usernameValue, password:passwordValue})" />
+    <Button class="p-button-danger" label="Submit" @click="onSubmit({username:usernameValue, password:passwordValue})" />
   </div>
 </template>
 
@@ -47,6 +47,14 @@ export default {
 }
 .login-form > * {
   margin: 30px 0;
+}
+.login-form{
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+  background-color: gray;
+  border-radius: 5%;
+  padding: 1%;
 }
 
 .p-field * {

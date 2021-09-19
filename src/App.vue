@@ -7,15 +7,17 @@
 </template>
 
 <style>
-@import '../node_modules/primevue/resources/themes/saga-blue/theme.css';
+@import '../node_modules/primevue/resources/themes/mdc-dark-indigo/theme.css';
 @import '../node_modules/primevue/resources/primevue.min.css';
 @import '../node_modules/primeicons/primeicons.css';
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* text-align: center; */
   color: #2c3e50;
+}
+body {
+  background-color: #121212
 }
 
 #nav {

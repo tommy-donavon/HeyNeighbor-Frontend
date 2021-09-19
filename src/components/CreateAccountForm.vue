@@ -1,57 +1,62 @@
 <template>
-  <div class="account-form">
-    <span class="p-float-label">
-      <InputText id="username" type="text" v-model="usernameValue" />
-      <label for="username">Username</label>
-    </span>
-    <span class="p-float-label">
-      <Password id="password" v-model="passwordValue" />
-      <label for="password">Password</label>
-    </span>
-    <span class="p-float-label">
-      <Password
-        id="verify-password"
-        :feedback="false"
-        v-model="verifyPasswordValue"
+  <div class="parent-form">
+    <div class="account-form">
+    <div>
+      <span class="p-float-label">
+        <InputText id="username" type="text" v-model="usernameValue" />
+        <label for="username">Username</label>
+      </span>
+      <span class="p-float-label">
+        <Password id="password" v-model="passwordValue" />
+        <label for="password">Password</label>
+      </span>
+      <span class="p-float-label">
+        <Password
+          id="verify-password"
+          :feedback="false"
+          v-model="verifyPasswordValue"
+        />
+        <label for="verify-password">Please Verify Password</label>
+      </span>
+      <span class="p-float-label">
+        <InputText id="firstName" v-model="firstnameValue" />
+        <label for="firstName">First Name</label>
+      </span>
+    </div>
+    <div>
+      <span class="p-float-label">
+        <InputText id="lastName" v-model="lastnameValue" />
+        <label for="lastName">Last Name</label>
+      </span>
+      <span class="p-float-label">
+        <InputText id="email" v-model="emailValue" />
+        <label for="email">Email</label>
+      </span>
+      <span class="p-float-label">
+        <InputText id="phoneNumber" v-model="phoneValue" />
+        <label for="phoneNumber">Phone Number</label>
+      </span>
+      <Dropdown
+        v-model="selectedUserType"
+        :options="userOptions"
+        optionLabel="type"
+        placeholder="Select User Type"
       />
-      <label for="verify-password">Please Verify Password</label>
-    </span>
-    <span class="p-float-label">
-      <InputText id="firstName" v-model="firstnameValue" />
-      <label for="firstName">First Name</label>
-    </span>
-    <span class="p-float-label">
-      <InputText id="lastName" v-model="lastnameValue" />
-      <label for="lastName">Last Name</label>
-    </span>
-    <span class="p-float-label">
-      <InputText id="email" v-model="emailValue" />
-      <label for="email">email</label>
-    </span>
-    <span class="p-float-label">
-      <InputText id="phoneNumber" v-model="phoneValue" />
-      <label for="phoneNumber">Phone Number</label>
-    </span>
-    <Dropdown
-      v-model="selectedUserType"
-      :options="userOptions"
-      optionLabel="type"
-      placeholder="Select User Type"
-    />
-
-    <Button
-      label="submit"
+    </div>
+    <!-- <FileUpload mode="basic" :customUpload="true" :showCancelButton="true" @select="onSelect"  /> -->
+    <!-- <Button id="submitBTN" label="upload" @click="onSubmit"/> -->
+  </div>
+    <Button class="p-button-danger"
+      label="Submit"
       ref="submitBTN"
       :disabled="isReady"
       @click="onSubmit"
     />
-    <!-- <FileUpload mode="basic" :customUpload="true" :showCancelButton="true" @select="onSelect"  /> -->
-    <!-- <Button id="submitBTN" label="upload" @click="onSubmit"/> -->
   </div>
 </template>
 
-//TODO add profile pic support //TODO check for already used username
-//TODO better error feedback
+//TODO add profile pic support //TODO check for already used username //TODO
+better error feedback
 <script>
 import { ref, watchEffect } from 'vue';
 import userClient from '@/clients/userClient.js';
@@ -135,8 +140,32 @@ export default {
     }
   }
 }
-.account-form > * {
-  margin: 30px 0;
+.account-form div > *:not(div) {
+  margin: 5%;
+  align-items: center;
+}
+.account-form div > div {
+  margin-left: 5%;
+}
+.account-form {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  
+}
+.parent-form {
+  display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6, BB7 */
+  display: -ms-flexbox; /* TWEENER - IE 10 */
+  display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
+  display: flex; /* NEW, Spec - Firefox, Chrome, Opera */
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  padding: 1% 2% 1% 1%;
+  border-radius: 5%;
+  background-color: gray;
+  
 }
 
 .p-field * {
