@@ -1,40 +1,63 @@
 <template>
   <div>
-    <ul id="messages"></ul>
+    <ul id="messages">
+      <li v-for="(msg,index) in messages" :key="index" >{{msg}}</li>
+    </ul>
     <div class="chat-input">
-      <Textarea rows="1" cols="150" /><Button
-        label="Enter"
-        class="p-button-danger"
-      />
+      <Textarea rows="1" cols="150" v-model="textInput" />
+      <Button label="Enter" class="p p-button-danger" @click="onSubmit" />
     </div>
   </div>
 </template>
 
+//TODO make dynamic
 <script>
-import { toRefs, watchEffect } from 'vue';
+import { toRefs, ref, watchEffect } from 'vue';
 import { io } from 'socket.io-client';
 export default {
   name: 'ChatWindow',
   setup(props) {
     const { serverName, room } = toRefs(props);
-    let socket = io('http://localhost:8080', {
-      path: `/api/chat/${serverName.value}`,
+    const textInput = ref('');
+    const messages = ref([]);
+    let socket = io(`http://localhost:8080/${serverName.value}`, {
+      path: `/api/chat/`,
       query: { room: `${room.value}` },
     });
+
     socket.on('connect', () => {
-      console.log('hi');
+      console.log(socket.connected);
     });
-    socket.on('disconnect', (reason) => {
-      console.log(reason);
+    socket.on('disconnect', () => {
+      console.log(socket.connected);
+    });
+    socket.on('connect_error', (error) => {
+      console.log(error);
+    });
+
+    socket.on('msg', (msg) => {
+      messages.value.push(msg)
     });
 
     watchEffect(() => {
       socket.disconnect()
-      socket = io('http://localhost:8080', {
-      path: `/api/chat/${serverName.value}`,
+      socket = io(`http://localhost:8080/${serverName.value}`, {
+      path: `/api/chat/`,
       query: { room: `${room.value}` },
     });
     })
+
+    const onSubmit = () => {
+      messages.value.push(textInput.value)
+      socket.emit('msg', textInput.value);
+      textInput.value = '';
+    };
+
+    return {
+      textInput,
+      onSubmit,
+      messages,
+    };
   },
   props: {
     serverName: {
@@ -54,11 +77,6 @@ export default {
   padding: 3px;
   position: fixed;
   bottom: 0;
-  display: flex;
-}
-
-.chat-input > * {
-  margin: 0.5%;
 }
 
 #messages {
