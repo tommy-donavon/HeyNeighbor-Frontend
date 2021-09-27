@@ -1,93 +1,56 @@
 <template>
-  <div>
-    <ul id="messages">
-      <li v-for="(msg,index) in messages" :key="index" >{{msg}}</li>
-    </ul>
-    <div class="chat-input">
-      <Textarea rows="1" cols="150" v-model="textInput" />
-      <Button label="Enter" class="p p-button-danger" @click="onSubmit" />
+  <div class="chatarea">
+    <div class="card">
+      <PanelMenu :model="serverMenuOptions" />
     </div>
+    <ChatWindow :serverName="serverName" :room="serverRoom"/>
   </div>
 </template>
 
-//TODO make dynamic
 <script>
-import { toRefs, ref, watchEffect } from 'vue';
-import { io } from 'socket.io-client';
+//TODO fetch property servers from api
+import { ref} from "vue"
+import ChatWindow from "@/components/ChatWindow.vue"
 export default {
-  name: 'ChatWindow',
-  setup(props) {
-    const { serverName, room } = toRefs(props);
-    const textInput = ref('');
-    const messages = ref([]);
-    let socket = io(`http://localhost:8080/${serverName.value}`, {
-      path: `/api/chat/`,
-      query: { room: `${room.value}` },
-    });
-
-    socket.on('connect', () => {
-      console.log(socket.connected);
-    });
-    socket.on('disconnect', () => {
-      console.log(socket.connected);
-    });
-    socket.on('connect_error', (error) => {
-      console.log(error);
-    });
-
-    socket.on('msg', (msg) => {
-      messages.value.push(msg)
-    });
-
-    watchEffect(() => {
-      socket.disconnect()
-      socket = io(`http://localhost:8080/${serverName.value}`, {
-      path: `/api/chat/`,
-      query: { room: `${room.value}` },
-    });
-    })
-
-    const onSubmit = () => {
-      messages.value.push(textInput.value)
-      socket.emit('msg', textInput.value);
-      textInput.value = '';
-    };
-
-    return {
-      textInput,
-      onSubmit,
-      messages,
-    };
-  },
-  props: {
-    serverName: {
-      type: String,
-      required: true,
+    name: 'Chat',
+    setup() {
+      const serverName = ref('test')
+      const serverRoom = ref('general')
+  
+        return {
+            serverMenuOptions: [
+              {
+                label: 'General',
+                icon: "pi pi-check",
+                command:() => {
+                  serverRoom.value = "general"
+                }
+              },
+              {
+                label: 'Announcments',
+                icon: "pi pi-check",
+                command:() => {
+                  serverRoom.value = "announcements"
+                }
+              }
+            ],
+            serverName,
+            serverRoom
+        }
     },
-    room: {
-      type: String,
-      required: true,
-    },
-  },
-};
+    components:{
+      ChatWindow,
+    }
+
+}
 </script>
 
-<style lang="scss" scoped>
-.chat-input {
-  padding: 3px;
-  position: fixed;
-  bottom: 0;
+<style scoped lang="scss">
+.p-panelmenu {
+    width: 22rem;
 }
 
-#messages {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-#messages li {
-  padding: 5px 10px;
-}
-#messages li:nth-child(odd) {
-  background: #eee;
+.chatarea {
+  display: flex;
 }
 </style>

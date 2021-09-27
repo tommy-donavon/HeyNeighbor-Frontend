@@ -8,29 +8,41 @@
       <Password id="password" v-model="passwordValue" toogleMask></Password>
       <label for="password">Password</label>
     </span>
-    <Button class="p-button-danger" label="Submit" @click="onSubmit({username:usernameValue, password:passwordValue})" />
+    <Button class="p-button-danger" label="Submit" @click="onSubmit({username:usernameValue, password:passwordValue}); onSuccessfulSubmit()" />
   </div>
 </template>
-
+//TODO check for user type
 <script>
 import { ref } from 'vue';
-import {mapActions} from "vuex";
+import {mapActions, useStore} from "vuex";
+import {useRouter} from "vue-router"
 
 export default {
   name: 'LoginForm',
   setup() {
     const usernameValue = ref('');
     const passwordValue = ref('');
+    const store = useStore()
+    const router = useRouter()
+
+    const onSuccessfulSubmit = () => {
+      const loginStatus = store.getters.getCurrentToken
+      if(!loginStatus || loginStatus === ""){
+        //present error message
+      }
+      router.push({name: 'User-Dash'})
+
+      
+
+    }
+
     return {
       usernameValue,
       passwordValue,
       ...mapActions({onSubmit:"setCurrentToken"}),
+      onSuccessfulSubmit
     };
   },
-  // computed: {
-  //   ...mapGetters({token:"getCurrentToken"}),
-  //   ...mapGetters({user:"getCurrentUser"})
-  // }
 };
 </script>
 

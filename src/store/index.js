@@ -1,29 +1,38 @@
 import { createStore } from 'vuex'
-import userClient from '@/clients/userClient.js'
+import UserClient from '@/clients/userClient.js'
+import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
   state: {
     currentToken: "",
     currentUser:{},
+    userProperties:[]
   },
+  plugins:[
+    createPersistedState({
+      storage: window.sessionStorage,
+    })
+  ],
   mutations: {
     setCurrentToken(state, payload){
       state.currentToken = payload;
     },
     setCurrentUser(state, payload){
       state.currentUser = payload;
+    },
+    setCurrentUserProperties(state, payload) {
+      state.userProperties = payload
     }
   },
   actions: {
     async setCurrentToken(state, loginInfo){
       try {
-        var data = await userClient.getToken(
+        var data = await UserClient.getToken(
           loginInfo.username,
           loginInfo.password,
         );
         state.commit("setCurrentToken", data.token)
-        localStorage.setItem("token", data.token)
-        var userData = await userClient.getUserInformation(data.token);
+        var userData = await UserClient.getUserInformation(data.token);
         state.commit("setCurrentUser", userData)
       } catch (err) {
         state.commit("setCurrentToken", "")
@@ -35,7 +44,7 @@ export default createStore({
   modules: {
   },
   getters: {
-    getCurrentToken: state => state.currentToken || localStorage.getItem("token"),
+    getCurrentToken: state => state.currentToken,
     getCurrentUser: state => state.currentUser
   }
 })
