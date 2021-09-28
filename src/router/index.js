@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import store from '../store'
 import Home from '../views/Home.vue';
+import ChatWindow from '../views/ChatWindow.vue'
 
 const routes = [
   {
@@ -12,6 +13,12 @@ const routes = [
     path: '/user-dash',
     name: 'User-Dash',
     component: () => import(/* webpackChunkName: "userdash" */ '../views/UserDash.vue')
+  },
+  {
+    path: '/chat',
+    name: 'Chat',
+    component: ChatWindow,
+    props: route => ({server_code: route.query.code})
   }
 ];
 

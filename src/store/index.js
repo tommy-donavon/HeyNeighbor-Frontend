@@ -1,5 +1,6 @@
 import { createStore } from 'vuex'
-import UserClient from '@/clients/userClient.js'
+import UserClient from '../clients/userClient.js'
+import PropertyClient from '../clients/propertyClient'
 import createPersistedState from 'vuex-persistedstate'
 
 export default createStore({
@@ -34,9 +35,12 @@ export default createStore({
         state.commit("setCurrentToken", data.token)
         var userData = await UserClient.getUserInformation(data.token);
         state.commit("setCurrentUser", userData)
+        var propertyData = await PropertyClient.getUserProperties(userData, data.token)
+        state.commit("setCurrentUserProperties", propertyData)
       } catch (err) {
         state.commit("setCurrentToken", "")
         state.commit("setCurrentUser", {})
+        state.commit("setCurrentUserProperties", {})
         console.error(err);
       }
     }
@@ -45,6 +49,7 @@ export default createStore({
   },
   getters: {
     getCurrentToken: state => state.currentToken,
-    getCurrentUser: state => state.currentUser
+    getCurrentUser: state => state.currentUser,
+    getCurrentUserProperties: state => state.userProperties
   }
 })

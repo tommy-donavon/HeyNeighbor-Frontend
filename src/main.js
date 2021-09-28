@@ -13,6 +13,7 @@ import tooltip from 'primevue/tooltip';
 import Dock from 'primevue/dock';
 import PanelMenu from 'primevue/panelmenu';
 import Textarea from 'primevue/textarea';
+import Card from 'primevue/card'
 
 createApp(App)
   .use(store)
@@ -28,4 +29,5 @@ createApp(App)
   .component('Dock', Dock)
   .component('PanelMenu', PanelMenu)
   .component('Textarea', Textarea)
+  .component('Card', Card)
   .mount('#app');

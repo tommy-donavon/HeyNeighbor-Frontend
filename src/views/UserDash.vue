@@ -1,30 +1,69 @@
 <template>
   <div id="nav">
-    <h2>HeyNeighbor</h2>
-    <!-- <Button class="p-button-danger" label="Log in" /> -->
+    <div class="user-options">
+      <i class="pi pi-user" style="fontSize: 1rem" />
+      <h3>{{ user.username }}</h3>
+      <i class="pi pi-cog" style="fontSize: 1rem" />
+    </div>
     <Button class="p-button-danger" label="Log out" @click="onLogout" />
+    <Dropdown
+      v-model="selectedProperty"
+      :options="propOptions"
+      class="drop"
+      @change="testChange"
+    />
   </div>
+  <div>
+    <DashOptions optName="Tenant Chat" optImg="appstore.svg" :optFunction="goToChat" />
+  </div>
+
+
+  
 </template>
 
 <script>
 import { useStore } from 'vuex';
-import { reactive } from 'vue';
+import { reactive, ref } from 'vue';
+import {useRouter} from 'vue-router'
+import DashOptions from '../components/DashOptions.vue'
 export default {
   name: 'UserDash',
   setup() {
     const store = useStore();
+    const router = useRouter()
     const user = reactive(store.getters.getCurrentUser);
+    const properties = reactive(store.getters.getCurrentUserProperties);
+    const selectedProperty = ref(properties[0].property_name || '');
+    let propOptions = properties.map((p) => p.property_name);
+
+
     const onLogout = () => {
       window.sessionStorage.clear();
-      window.location.reload()
+      window.location.reload();
     };
+
+    const testChange = () => {
+      console.log(selectedProperty.value);
+    };
+
+    const goToChat = () => {
+      const code = properties.find(p => p.property_name = selectedProperty.value).server_code
+      router.push({name:'Chat',query:{code:code}})
+    }
 
     return {
       user,
       onLogout,
-      // ...mapGetters({user:'getCurrentUser'})
+      selectedProperty,
+      propOptions,
+      testChange,
+      goToChat
+
     };
   },
+  components:{
+    DashOptions,
+  }
 };
 </script>
 
@@ -37,10 +76,20 @@ export default {
   float: right;
   margin: 0.1% 0.5%;
 }
-
-#nav h2 {
+#nav .drop {
+  float: right;
+  margin: 0.1% 0.5%;
+}
+#nav .user-options {
   float: left;
   margin: 0 auto;
   color: lightcoral;
+  display: flex;
 }
+#nav .user-options > * {
+  margin: 0% 1.5%;
+  user-select: none;
+}
+
+
 </style>
