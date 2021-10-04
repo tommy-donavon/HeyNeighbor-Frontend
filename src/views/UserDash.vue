@@ -5,7 +5,7 @@
       <h3>{{ user.username }}</h3>
       <i class="pi pi-cog" style="fontSize: 1rem" />
     </div>
-    <Button class="p-button-danger" label="Log out" @click="onLogout" />
+    <Button label="Log out" @click="onLogout" />
     <Dropdown
       v-model="selectedProperty"
       :options="propOptions"
@@ -14,28 +14,28 @@
     />
   </div>
   <div>
-    <DashOptions optName="Tenant Chat" optImg="appstore.svg" :optFunction="goToChat" />
+    <DashOptions
+      optName="Tenant Chat"
+      optImg="https://images1.apartments.com/i2/V81rGxWnZzR5onflaSGtH6cpUET0hfRD7MH5gitkUbU/116/the-piccadilly-apartments-salt-lake-city-ut-primary-photo.jpg?p=1"
+      :optFunction="goToChat"
+    />
   </div>
-
-
-  
 </template>
 
 <script>
 import { useStore } from 'vuex';
 import { reactive, ref } from 'vue';
-import {useRouter} from 'vue-router'
-import DashOptions from '../components/DashOptions.vue'
+import { useRouter } from 'vue-router';
+import DashOptions from '../components/DashOptions.vue';
 export default {
   name: 'UserDash',
   setup() {
     const store = useStore();
-    const router = useRouter()
+    const router = useRouter();
     const user = reactive(store.getters.getCurrentUser);
     const properties = reactive(store.getters.getCurrentUserProperties);
     const selectedProperty = ref(properties[0].property_name || '');
     let propOptions = properties.map((p) => p.property_name);
-
 
     const onLogout = () => {
       window.sessionStorage.clear();
@@ -47,9 +47,11 @@ export default {
     };
 
     const goToChat = () => {
-      const code = properties.find(p => p.property_name = selectedProperty.value).server_code
-      router.push({name:'Chat',query:{code:code}})
-    }
+      const code = properties.find(
+        (p) => (p.property_name = selectedProperty.value),
+      ).server_code;
+      router.push({ name: 'Chat', query: { code: code } });
+    };
 
     return {
       user,
@@ -57,13 +59,12 @@ export default {
       selectedProperty,
       propOptions,
       testChange,
-      goToChat
-
+      goToChat,
     };
   },
-  components:{
+  components: {
     DashOptions,
-  }
+  },
 };
 </script>
 
@@ -83,13 +84,11 @@ export default {
 #nav .user-options {
   float: left;
   margin: 0 auto;
-  color: lightcoral;
+  color: #c5e1a5;
   display: flex;
 }
 #nav .user-options > * {
   margin: 0% 1.5%;
   user-select: none;
 }
-
-
 </style>

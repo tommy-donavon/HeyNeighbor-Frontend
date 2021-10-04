@@ -2,6 +2,7 @@
   <div class="dash-options">
     <Card
       style="width:25em;display:flex;flex-direction:column;align-items:center;justify-content:center;"
+      @click="optFunction"
     >
       <template #header>
         <img
@@ -13,9 +14,9 @@
       <template #title>
         <h3>{{optName}}</h3>
       </template>
-      <template #footer style="">
+      <!-- <template #footer style="">
         <Button label="GO" @click="optFunction" />
-      </template>
+      </template> -->
     </Card>
   </div>
 </template>

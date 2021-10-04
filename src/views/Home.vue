@@ -1,8 +1,11 @@
 <template>
   <div id="nav">
     <h2>HeyNeighbor</h2>
-    <Button class="p-button-danger" label="Log in" @click="TogglePopup" />
-    <Button class="p-button-danger" label="Sign up" />
+    <div class="spacer">pad</div>
+    <div class="btns">
+      <Button label="Log in" @click="TogglePopup" />
+      <Button label="Sign up" />
+    </div>
   </div>
   <div>
     <Popup v-if="popupTrigger" :TogglePopup="TogglePopup">
@@ -35,17 +38,27 @@ export default {
 </script>
 <style lang="scss" scoped>
 #nav {
-  padding: 30px;
+  padding: 10px;
   position: sticky;
-}
-#nav button {
-  float: right;
-  margin: 0.1% 0.5%;
+  display: flex;
+  background-color: #3f403f;
+  justify-content: space-evenly;
+  border-radius: 2px;
+  gap: 10px;
 }
 
 #nav h2 {
-  float: left;
-  margin: 0 auto;
-  color: lightcoral;
+  color: #9fb8ad;
+}
+
+#nav .btns {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 10px;
+}
+
+#nav .spacer {
+  visibility: hidden;
+  flex-grow: 2;
 }
 </style>

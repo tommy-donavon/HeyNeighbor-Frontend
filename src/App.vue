@@ -6,7 +6,7 @@
 </template>
 
 <style>
-@import '../node_modules/primevue/resources/themes/mdc-dark-indigo/theme.css';
+@import '../node_modules/primevue/resources/themes/luna-green/theme.css';
 @import '../node_modules/primevue/resources/primevue.min.css';
 @import '../node_modules/primeicons/primeicons.css';
 #app {

@@ -33,7 +33,7 @@ export default {
         label: p,
         icon: 'pi pi-check',
         command: () => {
-          serverRoom.value = p.toLowerCase();
+          serverRoom.value = p;
         },
       };
     });

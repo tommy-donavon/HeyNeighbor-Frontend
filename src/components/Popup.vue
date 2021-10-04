@@ -4,7 +4,7 @@
       <slot />
     </div>
     <Button
-      class=" p-button-danger p-button-outlined p-button-rounded"
+      class=" p-button-outlined p-button-rounded"
       icon="pi pi-times"
       @click="TogglePopup"
     />

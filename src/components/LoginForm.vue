@@ -5,10 +5,10 @@
       <label for="username">Username</label>
     </span>
     <span class="p-float-label">
-      <Password id="password" v-model="passwordValue" toogleMask></Password>
+      <Password id="password" v-model="passwordValue" :feedback="false" :toogleMask="true"></Password>
       <label for="password">Password</label>
     </span>
-    <Button class="p-button-danger" label="Submit" @click="onSubmit({username:usernameValue, password:passwordValue}); onSuccessfulSubmit()" />
+    <Button label="Submit" @click="onSubmit({username:usernameValue, password:passwordValue}); onSuccessfulSubmit()" />
   </div>
 </template>
 //TODO check for user type
@@ -64,9 +64,9 @@ export default {
   display: flex;
   flex-direction: column;
   width: fit-content;
-  background-color: gray;
+  background-color: #3F403F;
   border-radius: 5%;
-  padding: 1%;
+  padding: 5%;
 }
 
 .p-field * {

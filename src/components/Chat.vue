@@ -1,11 +1,15 @@
 <template>
   <div>
     <ul id="messages">
-      <li v-for="(msg,index) in messages" :key="index" >{{msg}}</li>
+      <li v-for="(msg, index) in messages" :key="index">{{ msg }}</li>
     </ul>
     <div class="chat-input">
-      <Textarea rows="1" cols="150" v-model="textInput" />
-      <Button label="Enter" class="p p-button-danger" @click="onSubmit" />
+      <Textarea
+        class="chat-text"
+        rows="1"
+        v-model="textInput"
+        v-on:keyup.enter="onSubmit"
+      />
     </div>
   </div>
 </template>
@@ -14,41 +18,48 @@
 <script>
 import { toRefs, ref, watchEffect } from 'vue';
 import { io } from 'socket.io-client';
+import { useStore } from 'vuex';
 export default {
   name: 'Chat',
   setup(props) {
     const { serverName, room } = toRefs(props);
+    const store = useStore();
     const textInput = ref('');
     const messages = ref([]);
+    console.log(room.value);
     let socket = io(`http://localhost:8080/${serverName.value}`, {
       path: `/api/chat/`,
-      query: { room: `${room.value}` },
+      query: { room: `${room.value[0].toUpperCase() + room.value.slice(1)}` },
+      extraHeaders: {
+        Authorization: `Bearer ${store.getters.getCurrentToken}`,
+      },
     });
 
-    socket.on('connect', () => {
-      console.log(socket.connected);
-    });
-    socket.on('disconnect', () => {
-      console.log(socket.connected);
-    });
-    socket.on('connect_error', (error) => {
-      console.log(error);
-    });
+    socket.on('connect', () => console.log(socket.connected));
+    
+    socket.on('disconnect', (reason) => console.log(reason));
+
+    socket.on('connect_error', (error) => console.error(error));
 
     socket.on('msg', (msg) => {
-      messages.value.push(msg)
+      console.log(msg);
+      messages.value.push(room.value + ' ' + msg);
     });
 
     watchEffect(() => {
-      socket.disconnect()
+      messages.value = [];
+      // socket.disconnect()
       socket = io(`http://localhost:8080/${serverName.value}`, {
-      path: `/api/chat/`,
-      query: { room: `${room.value}` },
+        path: `/api/chat/`,
+        query: { room: `${room.value[0].toUpperCase() + room.value.slice(1)}` },
+        extraHeaders: {
+          Authorization: `Bearer ${store.getters.getCurrentToken}`,
+        },
+      });
     });
-    })
 
     const onSubmit = () => {
-      messages.value.push(textInput.value)
+      // messages.value.push(textInput.value)
       socket.emit('msg', textInput.value);
       textInput.value = '';
     };
@@ -76,8 +87,13 @@ export default {
 .chat-input {
   padding: 3px;
   position: fixed;
+  display: flex;
   bottom: 0;
 }
+
+// .chat-input .chat-text{
+
+// }
 
 #messages {
   list-style-type: none;
