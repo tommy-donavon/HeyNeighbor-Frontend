@@ -14,9 +14,6 @@
       <template #title>
         <h3>{{optName}}</h3>
       </template>
-      <!-- <template #footer style="">
-        <Button label="GO" @click="optFunction" />
-      </template> -->
     </Card>
   </div>
 </template>

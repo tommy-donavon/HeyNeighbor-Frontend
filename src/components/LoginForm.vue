@@ -27,10 +27,13 @@ export default {
 
     const onSuccessfulSubmit = () => {
       const loginStatus = store.getters.getCurrentToken
+      const user = store.getters.getCurrentUser
       if(!loginStatus || loginStatus === ""){
         //present error message
       }
-      router.push({name: 'User-Dash'})
+      if(user.account_type === 1){
+        router.push({name: 'User-Dash'})
+      }
 
       
 

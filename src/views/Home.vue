@@ -3,36 +3,45 @@
     <h2>HeyNeighbor</h2>
     <div class="spacer">pad</div>
     <div class="btns">
-      <Button label="Log in" @click="TogglePopup" />
-      <Button label="Sign up" />
+      <Button label="Log in" @click="ToggleLogin" />
+      <Button label="Sign up" @click="ToggleAccount" />
     </div>
   </div>
   <div>
-    <Popup v-if="popupTrigger" :TogglePopup="TogglePopup">
+    <Popup v-if="popupLogin" :TogglePopup="ToggleLogin">
       <LoginForm />
+    </Popup>
+    <Popup v-if="popupAcocunt" :TogglePopup="ToggleAccount">
+      <CreateAccountForm />
     </Popup>
   </div>
 </template>
 
 <script>
 import LoginForm from '@/components/LoginForm.vue';
+import CreateAccountForm from '../components/CreateAccountForm.vue'
 import Popup from '@/components/Popup.vue';
 import { ref } from 'vue';
 
 export default {
   name: 'Home',
   setup() {
-    const popupTrigger = ref(false);
-    const TogglePopup = () => (popupTrigger.value = !popupTrigger.value);
+    const popupLogin = ref(false);
+    const popupAcocunt = ref(false)
+    const ToggleLogin = () => (popupLogin.value = !popupLogin.value);
+    const ToggleAccount = () => (popupAcocunt.value = !popupAcocunt.value);
 
     return {
-      popupTrigger,
-      TogglePopup,
+      popupLogin,
+      ToggleLogin,
+      popupAcocunt,
+      ToggleAccount
     };
   },
   components: {
     LoginForm,
     Popup,
+    CreateAccountForm
   },
 };
 </script>

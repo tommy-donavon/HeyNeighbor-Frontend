@@ -14,7 +14,6 @@
   </div>
 </template>
 
-//TODO make dynamic
 <script>
 import { toRefs, ref, watchEffect } from 'vue';
 import { io } from 'socket.io-client';
@@ -35,11 +34,17 @@ export default {
       },
     });
 
-    socket.on('connect', () => console.log(socket.connected));
-    
-    socket.on('disconnect', (reason) => console.log(reason));
+    socket.on('connect', () => {
+      console.log(socket.connected);
+    });
 
-    socket.on('connect_error', (error) => console.error(error));
+    socket.on('disconnect', (reason) => {
+      console.log(reason);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error(error);
+    });
 
     socket.on('msg', (msg) => {
       console.log(msg);
@@ -48,7 +53,7 @@ export default {
 
     watchEffect(() => {
       messages.value = [];
-      // socket.disconnect()
+      socket.disconnect();
       socket = io(`http://localhost:8080/${serverName.value}`, {
         path: `/api/chat/`,
         query: { room: `${room.value[0].toUpperCase() + room.value.slice(1)}` },
@@ -56,10 +61,11 @@ export default {
           Authorization: `Bearer ${store.getters.getCurrentToken}`,
         },
       });
+      socket.connect();
     });
 
     const onSubmit = () => {
-      // messages.value.push(textInput.value)
+      messages.value.push(room.value + ' ' + textInput.value);
       socket.emit('msg', textInput.value);
       textInput.value = '';
     };
@@ -91,9 +97,11 @@ export default {
   bottom: 0;
 }
 
-// .chat-input .chat-text{
-
-// }
+.chat-input .chat-text {
+  width: calc(100vw - 20px);
+  margin: 30px;
+  // right: 200px;
+}
 
 #messages {
   list-style-type: none;

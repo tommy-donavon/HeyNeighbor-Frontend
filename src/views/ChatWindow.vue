@@ -2,15 +2,15 @@
   <div class="chatarea">
     <div class="card">
       <PanelMenu :model="serverMenuOptions" />
+      <!-- <Tree :value="onlineUsers" selectionMode="single" /> -->
     </div>
-    <div v-if="isMounted">
+    <div v-if="isMounted" class="chat-window">
       <Chat :serverName="serverName" :room="serverRoom" />
     </div>
   </div>
 </template>
 
 <script>
-//TODO fetch property servers from api
 import { ref, reactive, toRefs, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
@@ -37,19 +37,18 @@ export default {
         },
       };
     });
+    const onlineUsers = property.tenants.map((t) => {
+      if(t.user_status === 0) return t.username
+    })
 
-    onMounted(() => {
-      isMounted.value = true;
-      console.log(isMounted);
-      console.log(serverName.value);
-      console.log(serverRoom.value);
-    });
+    onMounted(() => (isMounted.value = true));
 
     return {
       serverMenuOptions,
       serverName,
       serverRoom,
       isMounted,
+      onlineUsers
     };
   },
   components: {
@@ -66,6 +65,10 @@ export default {
 <style scoped lang="scss">
 .p-panelmenu {
   width: 22rem;
+}
+
+.chat-window {
+  margin: 20px;
 }
 
 .chatarea {
