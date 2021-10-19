@@ -15,6 +15,13 @@ import PanelMenu from 'primevue/panelmenu';
 import Textarea from 'primevue/textarea';
 import Card from 'primevue/card';
 import Tree from 'primevue/tree';
+import Toolbar from 'primevue/toolbar'
+import Dialog from 'primevue/dialog'
+import Steps from 'primevue/steps'
+import ToastService from "primevue/toastservice"
+import Toast from "primevue/toast"
+import Avatar from 'primevue/avatar';
+import AvatarGroup from 'primevue/avatargroup';
 
 
 const app = createApp(App);
@@ -23,6 +30,7 @@ app
   .use(store)
   .use(router)
   .use(Primevue)
+  .use(ToastService)
   .directive('ripple', Ripple)
   .directive('tooltip', tooltip)
   .component('InputText', InputText)
@@ -35,4 +43,10 @@ app
   .component('Textarea', Textarea)
   .component('Card', Card)
   .component('Tree', Tree)
+  .component('Toolbar', Toolbar)
+  .component('Dialog', Dialog)
+  .component('Steps', Steps)
+  .component('Toast', Toast)
+  .component('Avatar', Avatar)
+  .component('AvatarGroup', AvatarGroup)
   .mount('#app');

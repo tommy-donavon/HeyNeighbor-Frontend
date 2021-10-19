@@ -1,73 +1,109 @@
 <template>
-  <div id="nav">
-    <h2>HeyNeighbor</h2>
-    <div class="spacer">pad</div>
-    <div class="btns">
+  <Toolbar style="background-color:transparent;border:none;">
+    <template #left>
+      <h2 style="color:white;user-select:none;">Hey Neighbor</h2>
+    </template>
+    <template #right>
+      <Button icon="pi pi-github" class="p-button-rounded" style="margin-right:5px;"/>
       <Button label="Log in" @click="ToggleLogin" />
-      <Button label="Sign up" @click="ToggleAccount" />
+      <Dialog
+        header="Please Enter Your Information Below"
+        v-model:visible="loginVisable"
+        style="width:fit-content;"
+      >
+      <LoginForm/>
+      </Dialog>
+    </template>
+  </Toolbar>
+  <div class="my-grid">
+    <div class="row">
+      <div class="column">
+        <div class="landing-info">
+          <div></div>
+          <h1 style="color:white;">Welcome to<br/> the Neighborhood</h1>
+          <div>
+            <Button label="Get Started" />
+          </div>
+        </div>
+      </div>
+      <div class="column">
+        <div>
+          <img
+            src="../assets/img/landing_chi.jpg"
+            style="height:100vh;width:100vw;"
+          />
+        </div>
+      </div>
     </div>
-  </div>
-  <div>
-    <Popup v-if="popupLogin" :TogglePopup="ToggleLogin">
-      <LoginForm />
-    </Popup>
-    <Popup v-if="popupAcocunt" :TogglePopup="ToggleAccount">
-      <CreateAccountForm />
-    </Popup>
   </div>
 </template>
 
 <script>
-import LoginForm from '@/components/LoginForm.vue';
-import CreateAccountForm from '../components/CreateAccountForm.vue'
-import Popup from '@/components/Popup.vue';
 import { ref } from 'vue';
+import LoginForm from '../components/LoginForm'
 
 export default {
   name: 'Home',
   setup() {
-    const popupLogin = ref(false);
-    const popupAcocunt = ref(false)
-    const ToggleLogin = () => (popupLogin.value = !popupLogin.value);
-    const ToggleAccount = () => (popupAcocunt.value = !popupAcocunt.value);
+    const loginVisable = ref(false);
+    const ToggleLogin = () => {
+      loginVisable.value = !loginVisable.value;
+    };
 
     return {
-      popupLogin,
+      loginVisable,
       ToggleLogin,
-      popupAcocunt,
-      ToggleAccount
     };
   },
   components: {
-    LoginForm,
-    Popup,
-    CreateAccountForm
+    LoginForm
   },
 };
 </script>
 <style lang="scss" scoped>
-#nav {
-  padding: 10px;
-  position: sticky;
+
+
+.row {
   display: flex;
-  background-color: #3f403f;
-  justify-content: space-evenly;
-  border-radius: 2px;
-  gap: 10px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
-#nav h2 {
-  color: #9fb8ad;
+.my-grid{
+  border-radius: 5px;
 }
 
-#nav .btns {
+.column {
   display: flex;
-  justify-content: space-evenly;
-  gap: 10px;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+  min-height: 100%;
 }
 
-#nav .spacer {
-  visibility: hidden;
-  flex-grow: 2;
+.landing-info{
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-direction: column;
+
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+
+    align-items: center;
+    justify-content: space-between;
 }
+.landing-info > * {
+  flex: 0 0 120px;
+}
+
+.landing-info > h1 {
+  font-size: 50px;
+}
+.p-toolbar-group-right > * {
+  margin-left: 5px;
+}
+
 </style>

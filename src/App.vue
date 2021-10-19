@@ -6,7 +6,7 @@
 </template>
 
 <style>
-@import '../node_modules/primevue/resources/themes/luna-green/theme.css';
+@import '../node_modules/primevue/resources/themes/rhea/theme.css';
 @import '../node_modules/primevue/resources/primevue.min.css';
 @import '../node_modules/primeicons/primeicons.css';
 #app {
@@ -16,15 +16,16 @@
   color: #2c3e50;
 }
 body {
-  background-color: #121212
+  background-color: #262a2b;
 }
 
-/* #nav a {
-  font-weight: bold;
-  color: #2c3e50;
+html, body {
+  height: 100%;
+  margin:0;
+}
+img {
+  max-height: 100%;
+  max-width: 100%;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
-} */
 </style>

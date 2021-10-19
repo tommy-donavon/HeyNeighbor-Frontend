@@ -7,7 +7,8 @@ export default createStore({
   state: {
     currentToken: "",
     currentUser:{},
-    userProperties:[]
+    userProperties:[],
+    currentChat:[]
   },
   plugins:[
     createPersistedState({
@@ -37,6 +38,8 @@ export default createStore({
         state.commit("setCurrentUser", userData)
         var propertyData = await PropertyClient.getUserProperties(userData, data.token)
         state.commit("setCurrentUserProperties", propertyData)
+
+
       } catch (err) {
         state.commit("setCurrentToken", "")
         state.commit("setCurrentUser", {})
