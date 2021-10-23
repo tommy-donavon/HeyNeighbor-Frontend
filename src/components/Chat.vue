@@ -1,7 +1,8 @@
 <template>
-  <div>
-    <ul id="messages">
-      <li v-for="(msg, index) in messages" :key="index">
+  <div class="chat-area">
+    <div class="msg-scroll">
+      <ul id="messages">
+      <li v-for="(msg, index) in state.messages" :key="index">
         <div class="message">
           <Avatar
             v-if="msg.user.profile_uri === ''"
@@ -19,51 +20,62 @@
         </div>
       </li>
     </ul>
+    </div>
+
     <div class="chat-input">
       <i class="pi pi-paperclip" style="color:white;" />
       <textarea
         v-on:keyup="textAreaAdjust"
         v-on:keyup.enter="onSubmit"
-        v-model="textInput"
+        v-model="state.textInput"
       />
     </div>
   </div>
 </template>
 
 <script>
-import { toRefs, ref, watchEffect } from 'vue';
+import { toRefs, reactive, watchEffect, onBeforeMount } from 'vue';
 import { io } from 'socket.io-client';
 import { useStore } from 'vuex';
-import ChatClient from '../clients/chatClient'
+import ChatClient from '../clients/chatClient';
 export default {
   name: 'Chat',
   setup(props) {
     const { serverName, room } = toRefs(props);
+    const state = reactive({
+      textInput: '',
+      messages: [],
+      propTenants: [],
+    });
     const store = useStore();
-    const textInput = ref('');
-    const messages = ref([]);
-    const propTenants = ref([])
     onBeforeMount(async () => {
       try {
-        propTenants.value.push(...store.getters.getCurrentUserProperties.filter(p => p.server_code === serverName.value))
-        let pstMsg = await ChatClient.getPastChats(serverName.value,room.value[0].toUpperCase() + room.value.slice(1))
-        if(pstMsg.messages !== undefined) {
-          propTenants.value[0].tenants.forEach(t => {
-            pstMsg.messages.forEach(m => {
-              if(t.username === m.user_name){
-                messages.value.push({
+        state.messages = [];
+        state.propTenants.push(
+          ...store.getters.getCurrentUserProperties.filter(
+            (p) => p.server_code === serverName.value,
+          ),
+        );
+        let pstMsg = await ChatClient.getPastChats(
+          serverName.value,
+          room.value[0].toUpperCase() + room.value.slice(1),
+        );
+        if (pstMsg.messages !== undefined) {
+          state.propTenants[0].tenants.forEach((t) => {
+            pstMsg.messages.forEach((m) => {
+              if (t.username === m.user_name) {
+                state.messages.push({
                   user: t,
-                  message: m.message
-                })
+                  message: m.message,
+                });
               }
-            })
-          })
+            });
+          });
         }
-      }catch(err){
-        console.error(err)
+      } catch (err) {
+        console.error(err);
       }
-
-    })
+    });
     let socket = io(`http://localhost:8080/${serverName.value}`, {
       path: `/api/chat/socket/`,
       query: { room: `${room.value[0].toUpperCase() + room.value.slice(1)}` },
@@ -86,27 +98,30 @@ export default {
 
     socket.on('msg', (msg) => {
       console.log(msg);
-      messages.value.push(room.value + ' ' + msg);
+      state.messages.push(room.value + ' ' + msg);
     });
 
     watchEffect(async () => {
       try {
-        messages.value = []
-        let pstMsg = await ChatClient.getPastChats(serverName.value,room.value[0].toUpperCase() + room.value.slice(1))
-        if(pstMsg.messages !== undefined) {
-          propTenants.value[0].tenants.forEach(t => {
-            pstMsg.messages.forEach(m => {
-              if(t.username === m.user_name){
-                messages.value.push({
+        state.messages = [];
+        let pstMsg = await ChatClient.getPastChats(
+          serverName.value,
+          room.value[0].toUpperCase() + room.value.slice(1),
+        );
+        if (pstMsg.messages !== undefined) {
+          state.propTenants[0].tenants.forEach((t) => {
+            pstMsg.messages.forEach((m) => {
+              if (t.username === m.user_name) {
+                state.messages.push({
                   user: t,
-                  message: m.message
-                })
+                  message: m.message,
+                });
               }
-            })
-          })
+            });
+          });
         }
-      }catch(err) {
-        console.error(err)
+      } catch (err) {
+        console.error(err);
       }
       socket.disconnect();
       socket = io(`http://localhost:8080/${serverName.value}`, {
@@ -122,11 +137,11 @@ export default {
     const onSubmit = () => {
       let message = {
         user: store.getters.getCurrentUser,
-        message: textInput.value.trim(),
+        message: state.textInput.trim(),
       };
-      messages.value.push(message);
+      state.messages.push(message);
       socket.emit('msg', message);
-      textInput.value = '';
+      state.textInput = '';
     };
 
     const textAreaAdjust = (event) => {
@@ -136,9 +151,8 @@ export default {
 
     return {
       textAreaAdjust,
-      textInput,
+      state,
       onSubmit,
-      messages,
     };
   },
   props: {
@@ -155,17 +169,24 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.chat-input {
-  padding: 3px;
-  position: fixed;
+.chat-area {
   display: flex;
-  bottom: 0;
+  width: 70vw;
+  height: 80vh;
+  flex-flow: column nowrap;
+  border-radius: 5px;
+  background-color: lightgray;
+  justify-content: space-between;
+  align-content: center;
+}
+
+.chat-input {
+  display: flex;
   background-color: gray;
-  border-radius: 15px;
-  width: 70%;
   justify-content: center;
   align-items: center;
   gap: 10px;
+  padding: 5px;
 }
 
 .chat-input > textarea {
@@ -181,14 +202,25 @@ export default {
 .chat-input > textarea:focus {
   outline: none;
 }
+.msg-scroll{
+  overflow:hidden;
+  overflow-y:auto;
+}
 
 #messages {
   list-style-type: none;
   margin: 0;
   padding: 0;
+  top:0;
+  animation: scroll 10s linear 1s infinite;
+}
+@keyframes scroll {
+  100%{top: -360px;}
 }
 #messages li {
   padding: 5px 10px;
+  border-top: 1px solid #9D989E;
+  border-bottom: 1px solid #9D989E;
 }
 .message {
   background-color: lightgray;
@@ -197,8 +229,6 @@ export default {
   justify-content: flex-start;
   align-items: center;
   gap: 15px;
-  padding: 5px;
   padding-right: 10px;
-  border-radius: 15px;
 }
 </style>

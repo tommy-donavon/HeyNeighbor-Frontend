@@ -2,7 +2,6 @@
   <div class="chatarea">
     <div class="card">
       <PanelMenu :model="serverMenuOptions" />
-      <!-- <Tree :value="onlineUsers" selectionMode="single" /> -->
     </div>
     <div v-if="isMounted" class="chat-window">
       <Chat :serverName="serverName" :room="serverRoom" />
@@ -11,7 +10,7 @@
 </template>
 
 <script>
-import { ref, reactive, toRefs, onMounted } from 'vue';
+import { ref, toRefs, onMounted } from 'vue';
 import { useStore } from 'vuex';
 
 import Chat from '@/components/Chat.vue';
@@ -21,11 +20,9 @@ export default {
     const isMounted = ref(false);
     const store = useStore();
     const { server_code } = toRefs(props);
-    const property = reactive(
-      store.getters.getCurrentUserProperties.find(
-        (p) => p.server_code == server_code.value,
-      ),
-    );
+    const property = store.getters.getCurrentUserProperties.find((p) => p.server_code == server_code.value)
+    const avaliableUsers = property.tenants.filter((t) => t.user_status === 0 && t.username !== store.getters.getCurrentUser.username)
+  console.log(avaliableUsers)
     const serverName = ref(property.server_code);
     const serverRoom = ref('general');
     const serverMenuOptions = property.channels.map((p) => {

@@ -3,7 +3,7 @@
   <Toast position="top-center" group="tc" />
   <div class="login-info">
     <span class="p-float-label">
-      <InputText id="username" type="text" v-model="usernameValue" />
+      <InputText id="username" type="text" v-model="state.username" />
       <label for="username">Username</label>
     </span>
     <span class="p-float-label">
@@ -11,20 +11,19 @@
         id="password"
         :feedback="false"
         :toogleMask="true"
-        v-model="passwordValue"
+        v-model="state.password"
       ></Password>
       <label for="password">Password</label>
     </span>
 
     <Button
       label="Submit"
-      @click="onSuccessfulSubmit(usernameValue, passwordValue)"
+      @click="onSuccessfulSubmit(state)"
     />
   </div>
 </template>
-//TODO check for user type
 <script>
-import { ref } from 'vue';
+import { reactive } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { useToast } from 'primevue/usetoast';
@@ -32,13 +31,15 @@ import { useToast } from 'primevue/usetoast';
 export default {
   name: 'LoginForm',
   setup() {
-    const usernameValue = ref('');
-    const passwordValue = ref('');
+    const state = reactive({
+      username: '',
+      password: '',
+    })
     const store = useStore();
     const router = useRouter();
     const toast = useToast();
 
-    const onSuccessfulSubmit = async (username, password) => {
+    const onSuccessfulSubmit = async ({username, password}) => {
       await store.dispatch('setCurrentToken', {
         username: username,
         password: password,
@@ -60,8 +61,7 @@ export default {
     };
 
     return {
-      usernameValue,
-      passwordValue,
+      state,
       onSuccessfulSubmit,
     };
   },

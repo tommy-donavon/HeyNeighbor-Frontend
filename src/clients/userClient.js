@@ -35,7 +35,7 @@ export default class UserClient {
     return data;
   };
   static createUserAccount = async (userInformation) => {
-    const response = await fetch(`${baseURL}create-admin`, {
+    const response = await fetch(`${baseURL}create-user`, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',

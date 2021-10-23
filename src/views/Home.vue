@@ -4,14 +4,18 @@
       <h2 style="color:white;user-select:none;">Hey Neighbor</h2>
     </template>
     <template #right>
-      <Button icon="pi pi-github" class="p-button-rounded" style="margin-right:5px;"/>
-      <Button label="Log in" @click="ToggleLogin" />
+      <Button
+        icon="pi pi-github"
+        class="p-button-rounded"
+        style="margin-right:5px;"
+      />
+      <Button label="Log in" @click="ToggleLogin('showLogin')" />
       <Dialog
         header="Please Enter Your Information Below"
-        v-model:visible="loginVisable"
+        v-model:visible="state.showLogin"
         style="width:fit-content;"
       >
-      <LoginForm/>
+        <LoginForm />
       </Dialog>
     </template>
   </Toolbar>
@@ -20,9 +24,19 @@
       <div class="column">
         <div class="landing-info">
           <div></div>
-          <h1 style="color:white;">Welcome to<br/> the Neighborhood</h1>
+          <h1 style="color:white;">
+            Welcome to<br />
+            the Neighborhood
+          </h1>
           <div>
-            <Button label="Get Started" />
+            <Button label="Get Started" @click="ToggleLogin('showRegister')" />
+            <Dialog
+              header="Please Enter Your Information Below"
+              v-model:visible="state.showRegister"
+              style="width:fit-content;"
+            >
+              <CreateAccountForm />
+            </Dialog>
           </div>
         </div>
       </div>
@@ -39,30 +53,33 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import LoginForm from '../components/LoginForm'
+import { reactive } from 'vue';
+import LoginForm from '../components/LoginForm';
+import CreateAccountForm from '../components/CreateAccountForm.vue'
 
 export default {
   name: 'Home',
   setup() {
-    const loginVisable = ref(false);
-    const ToggleLogin = () => {
-      loginVisable.value = !loginVisable.value;
+    const state = reactive({
+      showLogin: false,
+      showRegister: false,
+    });
+    const ToggleLogin = (element) => {
+      state[element] = !state[element];
     };
 
     return {
-      loginVisable,
+      state,
       ToggleLogin,
     };
   },
   components: {
-    LoginForm
+    LoginForm,
+    CreateAccountForm
   },
 };
 </script>
 <style lang="scss" scoped>
-
-
 .row {
   display: flex;
   flex-direction: row;
@@ -70,7 +87,7 @@ export default {
   width: 100%;
 }
 
-.my-grid{
+.my-grid {
   border-radius: 5px;
 }
 
@@ -82,18 +99,18 @@ export default {
   min-height: 100%;
 }
 
-.landing-info{
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    flex-direction: column;
+.landing-info {
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  flex-direction: column;
 
-    -ms-flex-align: center;
-    -webkit-align-items: center;
-    -webkit-box-align: center;
+  -ms-flex-align: center;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
 
-    align-items: center;
-    justify-content: space-between;
+  align-items: center;
+  justify-content: space-between;
 }
 .landing-info > * {
   flex: 0 0 120px;
@@ -105,5 +122,4 @@ export default {
 .p-toolbar-group-right > * {
   margin-left: 5px;
 }
-
 </style>

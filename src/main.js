@@ -22,7 +22,9 @@ import ToastService from "primevue/toastservice"
 import Toast from "primevue/toast"
 import Avatar from 'primevue/avatar';
 import AvatarGroup from 'primevue/avatargroup';
-
+import SpeedDial from 'primevue/speeddial'
+import RadioButton from 'primevue/radiobutton'
+import Divider from 'primevue/divider'
 
 const app = createApp(App);
 
@@ -49,4 +51,7 @@ app
   .component('Toast', Toast)
   .component('Avatar', Avatar)
   .component('AvatarGroup', AvatarGroup)
+  .component('SpeedDial', SpeedDial)
+  .component('RadioButton', RadioButton)
+  .component('Divider', Divider)
   .mount('#app');

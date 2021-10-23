@@ -24,7 +24,7 @@ export default createStore({
     },
     setCurrentUserProperties(state, payload) {
       state.userProperties = payload
-    }
+    },
   },
   actions: {
     async setCurrentToken(state, loginInfo){
@@ -39,12 +39,20 @@ export default createStore({
         var propertyData = await PropertyClient.getUserProperties(userData, data.token)
         state.commit("setCurrentUserProperties", propertyData)
 
-
       } catch (err) {
         state.commit("setCurrentToken", "")
         state.commit("setCurrentUser", {})
         state.commit("setCurrentUserProperties", {})
         console.error(err);
+      }
+    },
+    async addTenantToProperty(state, server_code){
+      try{
+        await PropertyClient.addTenantToProperty(server_code, state.getters.getCurrentToken)
+        var propertyData = await PropertyClient.getUserProperties(state.getters.getCurrentUser, state.getters.getCurrentToken)
+        state.commit("setCurrentUserProperties", propertyData)
+      }catch(err){
+        console.error(err)
       }
     }
   },

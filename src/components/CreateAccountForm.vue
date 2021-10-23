@@ -1,156 +1,202 @@
 <template>
+  <Toast />
+  <Toast position="top-center" group="tc" />
   <div class="parent-form">
-    <div class="account-form">
-      <div>
-        <span class="p-float-label">
-          <InputText id="username" type="text" v-model="usernameValue" />
-          <label for="username">Username</label>
-        </span>
-        <span class="p-float-label">
-          <Password id="password" v-model="passwordValue" />
-          <label for="password">Password</label>
-        </span>
-        <span class="p-float-label">
-          <Password
-            id="verify-password"
-            :feedback="false"
-            v-model="verifyPasswordValue"
-          />
-          <label for="verify-password">Please Verify Password</label>
-        </span>
-        <span class="p-float-label">
-          <InputText id="firstName" v-model="firstnameValue" />
-          <label for="firstName">First Name</label>
-        </span>
-      </div>
-      <div>
-        <span class="p-float-label">
-          <InputText id="lastName" v-model="lastnameValue" />
-          <label for="lastName">Last Name</label>
-        </span>
-        <span class="p-float-label">
-          <InputText id="email" v-model="emailValue" />
-          <label for="email">Email</label>
-        </span>
-        <span class="p-float-label">
-          <InputText id="phoneNumber" v-model="phoneValue" />
-          <label for="phoneNumber">Phone Number</label>
-        </span>
-        <Dropdown
-          v-model="selectedUserType"
-          :options="userOptions"
-          optionLabel="type"
-          placeholder="Select User Type"
-        />
-      </div>
-      <input
-        type="file"
-        @change="changePic"
-        accept="image/*"
-        placeholder="select picture"
+    <div class="p-float-label">
+      <InputText
+        id="username"
+        v-model="state.username.value"
+        :class="{ 'p-isInvalid': state.username.isInvalid }"
+        @focus="() => (state.username.focused = true)"
       />
-      <!-- <FileUpload mode="basic" :customUpload="true" :disabled="true" accept="image/*" /> -->
-      <!-- <Button id="submitBTN" label="upload" @click="onSubmit"/> -->
+      <label for="username" :class="{ 'p-error': state.username.isInvalid }"
+        >Username</label
+      >
     </div>
-    <Button
-      class="p-button-danger"
-      label="Submit"
-      ref="submitBTN"
-      :disabled="isReady"
-      @click="onSubmit"
-    />
+    <small v-if="state.username.isInvalid" class="p-error"
+      >Please Enter in Username</small
+    >
+    <div class="p-float-label">
+      <Password
+        v-model="state.password.value"
+        @focus="() => (state.password.focused = true)"
+      >
+        <template #header>
+          <h6>Pick a password</h6>
+        </template>
+        <template #footer="sp">
+          {{ sp.level }}
+          <Divider />
+          <p class="p-mt-2">Suggestions</p>
+          <ul class="p-pl-2 p-ml-2 p-mt-0" style="line-height: 1.5">
+            <li>At least one lowercase</li>
+            <li>At least one uppercase</li>
+            <li>At least one numeric</li>
+            <li>Minimum 8 characters</li>
+          </ul>
+        </template>
+      </Password>
+      <label for="password" :class="{ 'p-error': state.password.isInvalid }"
+        >Password</label
+      >
+    </div>
+    <small v-if="state.password.isInvalid" class="p-error"
+      >Please enter at least a medium strength password</small
+    >
+    <div class="p-float-label">
+      <InputText
+        id="first_name"
+        v-model="state.first_name.value"
+        :class="{ 'p-isInvalid': state.first_name.isInvalid }"
+        @focus="() => (state.first_name.focused = true)"
+      />
+      <label for="first_name" :class="{ 'p-error': state.username.isInvalid }"
+        >First Name</label
+      >
+    </div>
+    <small v-if="state.first_name.isInvalid" class="p-error"
+      >Please Enter Your First Name</small
+    >
+    <div class="p-float-label">
+      <InputText
+        id="last_name"
+        v-model="state.last_name.value"
+        :class="{ 'p-isInvalid': state.last_name.isInvalid }"
+        @focus="() => (state.last_name.focused = true)"
+      />
+      <label for="last_name" :class="{ 'p-error': state.last_name.isInvalid }"
+        >Last Name</label
+      >
+    </div>
+    <small v-if="state.last_name.isInvalid" class="p-error"
+      >Please Enter Your Last Name</small
+    >
+    <div class="p-float-label">
+      <InputText
+        id="email"
+        v-model="state.email.value"
+        :class="{ 'p-isInvalid': state.email.isInvalid }"
+        @focus="() => (state.email.focused = true)"
+      />
+      <label for="email" :class="{ 'p-error': state.email.isInvalid }"
+        >Email</label
+      >
+    </div>
+    <small v-if="state.email.isInvalid" class="p-error"
+      >Please Enter A Valid Email</small
+    >
+    <div class="account-types">
+      <div class="p-field-radiobutton">
+        <RadioButton
+          name="accountTenant"
+          value="Tenant"
+          v-model="accountType"
+        />
+        <label for="accountTenant"> Tenant</label>
+      </div>
+      <div class="p-field-radiobutton">
+        <RadioButton name="accountAdmin" value="Admin" v-model="accountType" />
+        <label for="accountAdmin"> Property Manager</label>
+      </div>
+    </div>
+    <Button label="Submit" @click="submit" />
   </div>
 </template>
 
-//TODO add profile pic support //TODO check for already used username //TODO
-better error feedback
 <script>
-import { ref } from 'vue';
-import BucketClient from '../clients/awsBucketClient.js';
-// import userClient from '@/clients/userClient.js';
+import { reactive, watchEffect, ref } from 'vue';
+import { useToast } from 'primevue/usetoast';
+import UserClient from '../clients/userClient';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 
 export default {
+  name: 'CreateAccountForm',
   setup() {
-    const usernameValue = ref('');
-    const passwordValue = ref('');
-    const verifyPasswordValue = ref('');
-    const firstnameValue = ref('');
-    const lastnameValue = ref('');
-    const emailValue = ref('');
-    const phoneValue = ref('');
-    const selectedUserType = ref('');
-    const isReady = ref(false);
-    let profile_pic = undefined;
+    const state = reactive({
+      username: { value: '', isInvalid: true, focused: false },
+      password: { value: '', isInvalid: true, focused: false },
+      first_name: { value: '', isInvalid: true, focused: false },
+      last_name: { value: '', isInvalid: true, focused: false },
+      email: { value: '', isInvalid: true, focused: false },
+      account_type: { value: 1 },
+    });
+    const accountType = ref('Tenant');
+    const toast = useToast();
+    const store = useStore();
+    const router = useRouter();
 
-    const changePic = (event) => {
-      console.log(event.target.files[0]);
-      profile_pic = event.target.files[0];
-    };
-    const onSubmit = async () => {
-      try {
-        const test = await BucketClient.uploadPhoto(
-          usernameValue.value,
-          profile_pic,
-          profile_pic.type,
+    watchEffect(() => {
+      state.username.isInvalid =
+        state.username.focused && !/^\w+$/.test(state.username.value);
+
+      state.password.isInvalid =
+        state.password.focused &&
+        !/^(((?=.*[a-z])(?=.*[A-Z]))|((?=.*[a-z])(?=.*[0-9]))|((?=.*[A-Z])(?=.*[0-9])))(?=.{6,})./.test(
+          state.password.value,
         );
-        console.log(test)
-      } catch (err) {
-        console.error(err);
+
+      state.first_name.isInvalid =
+        state.first_name.focused && !/^[A-z]+$/.test(state.first_name.value);
+
+      state.last_name.isInvalid =
+        state.last_name.focused && !/^[A-z]+$/.test(state.last_name.value);
+      state.email.isInvalid =
+        state.email.focused &&
+        !/^([\w.-]+)@([\w-]+)((\.(\w){2,3})+)$/.test(state.email.value);
+
+      state.account_type.value = accountType.value === 'Tenant' ? 1 : 0;
+    });
+
+    const submit = async () => {
+      let userInfo = {};
+      for (const prop in state) {
+        if (state[prop].isInvalid) {
+          toast.add({
+            severity: 'error',
+            summary: 'Please Try Again',
+            detail: 'Sign Up Failed',
+            group: 'tc',
+            life: 4000,
+          });
+          return;
+        }
+        userInfo[prop] = state[prop].value;
       }
-
-      // const userInformation = {
-      //   username: usernameValue.value,
-      //   password: passwordValue.value,
-      //   first_name: firstnameValue.value,
-      //   last_name: lastnameValue.value,
-      //   email: emailValue.value,
-      //   phone_number: phoneValue.value,
-      //   account_type: Number(selectedUserType.value.value),
-      //   user_status: 1,
-      // };
-      // try {
-      //   await userClient.createUserAccount(userInformation);
-      // } catch (err) {
-      //   console.error(err);
-      // }
+      try {
+        await UserClient.createUserAccount(userInfo);
+        await store.dispatch('setCurrentToken', {
+          username: state.username.value,
+          password: state.password.value,
+        });
+        const loginStatus = await store.getters.getCurrentToken;
+        const user = await store.getters.getCurrentUser;
+        if (!loginStatus || loginStatus === '') {
+          toast.add({
+            severity: 'error',
+            summary: 'Please Try Again',
+            detail: 'Log In Failed',
+            group: 'tc',
+            life: 4000,
+          });
+        }
+        if (user.account_type === 1) {
+          router.push({ name: 'User-Dash' });
+        }
+      } catch (err) {
+        toast.add({
+          severity: 'error',
+          summary: 'Please Try Again',
+          detail: 'Sign Up Failed',
+          group: 'tc',
+          life: 4000,
+        });
+      }
     };
-    // watchEffect(() => {
-    //   var validUserName = usernameValue.value.length > 0;
-    //   var validPasswordValue = passwordValue.value.length > 0;
-    //   var matchPass = passwordValue.value === verifyPasswordValue.value;
-    //   var validName =
-    //     firstnameValue.value.length > 0 && lastnameValue.value.length > 0;
-    //   var validEmail = emailValue.value.length > 0;
-    //   var validPhone = phoneValue.value.length > 0;
-    //   var validUserType = selectedUserType.value.value !== undefined;
-
-    //   isReady.value = !(
-    //     validUserName &&
-    //     validPasswordValue &&
-    //     matchPass &&
-    //     validName &&
-    //     validEmail &&
-    //     validPhone &&
-    //     validUserType
-    //   );
-    // });
     return {
-      usernameValue,
-      passwordValue,
-      verifyPasswordValue,
-      onSubmit,
-      isReady,
-      firstnameValue,
-      lastnameValue,
-      emailValue,
-      phoneValue,
-      selectedUserType,
-      profile_pic,
-      changePic,
-      userOptions: [
-        { type: 'Propery-Manager/Landlord', value: 0 },
-        { type: 'Tenant', value: 1 },
-      ],
+      state,
+      accountType,
+      submit,
     };
   },
 };
@@ -167,33 +213,13 @@ export default {
     }
   }
 }
-.account-form div > *:not(div) {
-  margin: 5%;
-  align-items: center;
-}
-.account-form div > div {
-  margin-left: 5%;
-}
-.account-form {
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-}
+
 .parent-form {
-  display: -webkit-box; /* OLD - iOS 6-, Safari 3.1-6, BB7 */
-  display: -ms-flexbox; /* TWEENER - IE 10 */
-  display: -webkit-flex; /* NEW - Safari 6.1+. iOS 7.1+, BB10 */
-  display: flex; /* NEW, Spec - Firefox, Chrome, Opera */
-  flex-direction: column;
+  display: flex;
+  flex-flow: column wrap;
   justify-content: center;
   align-items: center;
-  width: fit-content;
-  padding: 1% 2% 1% 1%;
-  border-radius: 5%;
-  background-color: gray;
-}
-
-.p-field * {
-  display: block;
+  align-content: space-around;
+  gap: 25px;
 }
 </style>
