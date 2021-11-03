@@ -6,10 +6,6 @@
         style="color:white;"
         @click="() => router.go(-1)"
       />
-      <Button
-        label="New Request"
-        @click="() => (state.formVisable = !state.formVisable)"
-      />
     </template>
   </Toolbar>
   <Dialog
@@ -19,7 +15,7 @@
   >
     <MaintenanceForm :server_code="state.server_code" />
   </Dialog>
-  <div class="main-container">
+  <div v-if="state.toDos.length || state.progress.length || state.complete.length" class="main-container">
     <div class="spacer">
       <hr />
       <span>Requested</span>
@@ -37,6 +33,9 @@
         <template #content>
           {{ req.description }}<br /><br />Severity:
           {{ state.severity[req.severity] }}
+        </template>
+        <template #footer>
+          <Button @click="moveCard('toDos', 'progress', req)" label="Start" />
         </template>
       </Card>
     </div>
@@ -58,6 +57,12 @@
           {{ req.description }}<br /><br />Severity:
           {{ state.severity[req.severity] }}
         </template>
+        <template #footer>
+          <Button
+            @click="moveCard('progress', 'complete', req)"
+            label="Mark Done"
+          />
+        </template>
       </Card>
     </div>
     <div class="spacer">
@@ -78,11 +83,11 @@
           {{ req.description }}<br /><br />Severity:
           {{ state.severity[req.severity] }}
         </template>
-        <template #footer>
-          <Button @click="confirmDone(req)" label="Confrim" />
-        </template>
       </Card>
     </div>
+  </div>
+  <div v-else>
+    <h3>No request have been made on this property</h3>
   </div>
 </template>
 
@@ -93,7 +98,7 @@ import { useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 import client from '../clients/maintenanceClient';
 export default {
-  name: 'Maintenance-Dash',
+  name: 'Admin-Maintenance-Dash',
   setup(props) {
     const { server_code } = toRefs(props);
     const router = useRouter();
@@ -116,37 +121,36 @@ export default {
           token,
         );
         state.toDos = state.mainRequest.filter(
-          (r) =>
-            !r.admin_checked_done && !r.tenant_checked_done && !r.in_progress,
+          (r) => !r.admin_checked_done && !r.tenant_checked_done && !r.in_progress
         );
-        state.progress = state.mainRequest.filter(
-          (r) =>
-            !r.admin_checked_done && !r.tenant_checked_done && r.in_progress,
-        );
-        state.complete = state.mainRequest.filter(
-          (r) =>
-            r.admin_checked_done && !r.tenant_checked_done && r.in_progress,
-        );
+        state.progress = state.mainRequest.filter((r) => !r.admin_checked_done && !r.tenant_checked_done && r.in_progress)
+        state.complete = state.mainRequest.filter((r) => r.admin_checked_done && !r.tenant_checked_done && r.in_progress)
       } catch (err) {
         console.error(err);
       }
     });
 
-    const confirmDone = async (request) => {
-      state.complete = state.complete.filter(r => r.ID !== request.ID)
-      const token = store.getters.getCurrentToken
-      try {
-        await client.deleteMaintenanceRequest(request.ID, token)
-      }catch(err){
-        console.error(err)
-      }
+    const moveCard = async (from, to, request) => {
+      state[to].push(request);
+      state[from] = state[from].filter((r) => r.ID !== request.ID);
+        if(request.in_progress){
+          request.admin_checked_done = true
+        }else{
+          request.in_progress = true;
+        }
+      const token = store.getters.getCurrentToken;
 
-    }
+      try {
+        await client.updateMaintenanceRequest(request, token);
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
     return {
       state,
       router,
-      confirmDone
+      moveCard,
     };
   },
   components: {

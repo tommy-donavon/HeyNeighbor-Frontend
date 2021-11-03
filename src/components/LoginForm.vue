@@ -16,10 +16,7 @@
       <label for="password">Password</label>
     </span>
 
-    <Button
-      label="Submit"
-      @click="onSuccessfulSubmit(state)"
-    />
+    <Button label="Submit" @click="onSuccessfulSubmit(state)" />
   </div>
 </template>
 <script>
@@ -34,12 +31,12 @@ export default {
     const state = reactive({
       username: '',
       password: '',
-    })
+    });
     const store = useStore();
     const router = useRouter();
     const toast = useToast();
 
-    const onSuccessfulSubmit = async ({username, password}) => {
+    const onSuccessfulSubmit = async ({ username, password }) => {
       await store.dispatch('setCurrentToken', {
         username: username,
         password: password,
@@ -55,9 +52,8 @@ export default {
           life: 4000,
         });
       }
-      if (user.account_type === 1) {
-        router.push({ name: 'User-Dash' });
-      }
+      if (user.account_type === 1) router.push({ name: 'User-Dash' });
+      else if (user.account_type === 0) router.push({ name: 'Admin-Dash' });
     };
 
     return {

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
-import store from '../store'
+import store from '../store';
 
 const routes = [
   {
@@ -11,7 +11,31 @@ const routes = [
   {
     path: '/user-dash',
     name: 'User-Dash',
-    component: () => import(/* webpackChunkName: "userdash" */ '../views/UserDash.vue')
+    component: () =>
+      import(/* webpackChunkName: "userdash" */ '../views/UserDash.vue'),
+  },
+  {
+    path: '/admin-dash',
+    name: 'Admin-Dash',
+    component: () => import(/* webpackChunkName: "admindash" */ '../views/AdminDash.vue')
+  },
+  {
+    path: '/service-dash',
+    name: 'Maintenance-Dash',
+    component: () =>
+      import(
+        /* webpackChunkName: "maintenancedash" */ '../views/MaintenanceDash.vue'
+      ),
+    props: (route) => ({ server_code: route.query.server_code }),
+  },
+  {
+    path: '/admin-service-dash',
+    name: 'Admin-Maintenance-Dash',
+    component: () =>
+      import(
+        /* webpackChunkName: "maintenancedash" */ '../views/AdminMaintenanceDash'
+      ),
+    props: (route) => ({ server_code: route.query.server_code }),
   },
 ];
 
@@ -25,8 +49,7 @@ router.beforeEach((to, from, next) => {
   const authRequired = !publicPages.includes(to.path);
   const loggedIn = store.getters.getCurrentToken;
 
-  if (authRequired && loggedIn === "") next('/');
-  else next();
+  authRequired && !loggedIn ? next('/') : next();
 });
 
 export default router;

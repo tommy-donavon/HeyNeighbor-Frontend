@@ -3,12 +3,15 @@
     <template #left>
       <Avatar
         v-if="state.user.profile_uri === ''"
-        :label="state.user.username.charAt(0).toUpperCase()"
+        :label="
+              state.user.first_name.charAt(0).toUpperCase() +
+                state.user.last_name.charAt(0).toUpperCase()
+            "
         style="color:black;user-select:none;"
       />
       <h3 style="color:white;">{{ state.user.username }}</h3>
       <Button label="Pay Rent" />
-      <Button label="New Service Request" />
+      <Button label="New Service Request" @click="goToMaintenanceDash" />
     </template>
     <template #right>
       <Dropdown
@@ -61,13 +64,13 @@
 <script>
 import { useStore } from 'vuex';
 import { reactive } from 'vue';
-// import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import ChatWindow from './ChatWindow.vue';
 export default {
   name: 'UserDash',
   setup() {
     const store = useStore();
-    // const router = useRouter();
+    const router = useRouter();
     let user = store.getters.getCurrentUser;
     let properties = store.getters.getCurrentUserProperties;
     const state = reactive({
@@ -81,13 +84,19 @@ export default {
       dialog_visable: false,
     });
 
+
     const currentProperty = properties[0];
     let propOptions = state.properties.map((p) => p.property_name);
+    const goToMaintenanceDash = () =>{
+      router.push({name: 'Maintenance-Dash', query:{server_code: currentProperty.server_code}})
+    }
 
     const onLogout = () => {
       window.sessionStorage.clear();
       window.location.reload();
     };
+
+    
 
     const submitCode = async (server_code) => await store.dispatch('addTenantToProperty',server_code)
 
@@ -97,7 +106,8 @@ export default {
       onLogout,
       currentProperty,
       newPropertyInfo,
-      submitCode
+      submitCode,
+      goToMaintenanceDash
     };
   },
   components: {

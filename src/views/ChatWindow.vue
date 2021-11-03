@@ -1,52 +1,48 @@
 <template>
   <div class="chatarea">
     <div class="card">
-      <PanelMenu :model="serverMenuOptions" />
+      <PanelMenu :model="state.serverMenuOptions" />
     </div>
-    <div v-if="isMounted" class="chat-window">
-      <Chat :serverName="serverName" :room="serverRoom" />
+    <div v-if="state.isMounted" class="chat-window">
+      <Chat :serverName="state.server_code" :room="state.server_room" />
     </div>
   </div>
 </template>
 
 <script>
-import { ref, toRefs, onMounted } from 'vue';
+import { toRefs, onMounted, reactive } from 'vue';
 import { useStore } from 'vuex';
 
 import Chat from '@/components/Chat.vue';
 export default {
   name: 'ChatWindow',
   setup(props) {
-    const isMounted = ref(false);
     const store = useStore();
     const { server_code } = toRefs(props);
     const property = store.getters.getCurrentUserProperties.find((p) => p.server_code == server_code.value)
-    const avaliableUsers = property.tenants.filter((t) => t.user_status === 0 && t.username !== store.getters.getCurrentUser.username)
-  console.log(avaliableUsers)
-    const serverName = ref(property.server_code);
-    const serverRoom = ref('general');
-    const serverMenuOptions = property.channels.map((p) => {
-      return {
-        label: p,
-        icon: 'pi pi-check',
-        command: () => {
-          serverRoom.value = p;
-        },
-      };
+    const state = reactive({
+      isMounted: false,
+      server_code: server_code,
+      avaliableUsers: property.tenants.filter(
+        (t) =>
+          t.user_status === 0 &&
+          t.username !== store.getters.getCurrentUser.username,
+      ),
+      server_room: 'general',
+      serverMenuOptions: property.channels.map((p) => {
+        return {
+          label: p,
+          icon: 'pi pi-check',
+          command: () => {
+            state.server_room = p;
+          },
+        };
+      }),
     });
-    const onlineUsers = property.tenants.map((t) => {
-      if(t.user_status === 0) return t.username
-    })
 
-    onMounted(() => (isMounted.value = true));
+    onMounted(() => (state.isMounted = true));
 
-    return {
-      serverMenuOptions,
-      serverName,
-      serverRoom,
-      isMounted,
-      onlineUsers
-    };
+    return { state };
   },
   components: {
     Chat,

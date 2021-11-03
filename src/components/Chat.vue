@@ -48,6 +48,7 @@ export default {
       propTenants: [],
     });
     const store = useStore();
+    let pstMsg = []
     onBeforeMount(async () => {
       try {
         state.messages = [];
@@ -56,22 +57,6 @@ export default {
             (p) => p.server_code === serverName.value,
           ),
         );
-        let pstMsg = await ChatClient.getPastChats(
-          serverName.value,
-          room.value[0].toUpperCase() + room.value.slice(1),
-        );
-        if (pstMsg.messages !== undefined) {
-          state.propTenants[0].tenants.forEach((t) => {
-            pstMsg.messages.forEach((m) => {
-              if (t.username === m.user_name) {
-                state.messages.push({
-                  user: t,
-                  message: m.message,
-                });
-              }
-            });
-          });
-        }
       } catch (err) {
         console.error(err);
       }
@@ -93,6 +78,7 @@ export default {
     });
 
     socket.on('connect_error', (error) => {
+      console.error('hi')
       console.error(error);
     });
 
@@ -104,7 +90,7 @@ export default {
     watchEffect(async () => {
       try {
         state.messages = [];
-        let pstMsg = await ChatClient.getPastChats(
+        pstMsg = await ChatClient.getPastChats(
           serverName.value,
           room.value[0].toUpperCase() + room.value.slice(1),
         );
