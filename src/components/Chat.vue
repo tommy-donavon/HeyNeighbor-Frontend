@@ -2,28 +2,49 @@
   <div class="chat-area">
     <div class="msg-scroll">
       <ul id="messages">
-      <li v-for="(msg, index) in state.messages" :key="index">
-        <div class="message">
-          <Avatar
-            v-if="msg.user.profile_uri === ''"
-            :label="
-              msg.user.first_name.charAt(0).toUpperCase() +
-                msg.user.last_name.charAt(0).toUpperCase()
-            "
-            style="color:black;user-select:none;"
-            size="large"
-          />
-          <div>
-            <h3>{{ msg.user.username }}</h3>
-            <p>{{ msg.message }}</p>
+        <li v-for="(msg, index) in state.messages" :key="index">
+          <div class="message">
+            <Avatar
+              v-if="msg.user.profile_uri === ''"
+              :label="
+                msg.user.first_name.charAt(0).toUpperCase() +
+                  msg.user.last_name.charAt(0).toUpperCase()
+              "
+              style="color:black;user-select:none;"
+              size="large"
+            />
+            <Avatar v-else :image="msg.user.profile_uri" size="large" />
+            <div>
+              <h3>{{ msg.user.username }}</h3>
+              <p v-if="msg.message">{{ msg.message }}</p>
+              <Image
+                v-if="msg.image_uri || msg.image"
+                :src="msg.image_uri || msg.image"
+                alt="image"
+                width="250"
+                preview
+              />
+            </div>
           </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
     </div>
 
     <div class="chat-input">
-      <i class="pi pi-paperclip" style="color:white;" />
+      <i
+        class="pi pi-paperclip"
+        style="color:white;"
+        type="file"
+        @click="handleFileClick"
+      />
+      <input
+        style="visibility: hidden;width:1px;"
+        type="file"
+        id="upload-img"
+        name="upload-img"
+        @change="addAttachment($event)"
+        accept="image/*"
+      />
       <textarea
         v-on:keyup="textAreaAdjust"
         v-on:keyup.enter="onSubmit"
@@ -38,17 +59,19 @@ import { toRefs, reactive, watchEffect, onBeforeMount } from 'vue';
 import { io } from 'socket.io-client';
 import { useStore } from 'vuex';
 import ChatClient from '../clients/chatClient';
+import AWSCLient from '../clients/awsBucketClient';
 export default {
   name: 'Chat',
   setup(props) {
     const { serverName, room } = toRefs(props);
+
     const state = reactive({
       textInput: '',
       messages: [],
       propTenants: [],
     });
     const store = useStore();
-    let pstMsg = []
+    let pstMsg = [];
     onBeforeMount(async () => {
       try {
         state.messages = [];
@@ -69,7 +92,7 @@ export default {
       },
     });
 
-    socket.on('connect', () => {
+    socket.on('connect', async () => {
       console.log(socket.connected);
     });
 
@@ -78,7 +101,7 @@ export default {
     });
 
     socket.on('connect_error', (error) => {
-      console.error('hi')
+      console.error('hi');
       console.error(error);
     });
 
@@ -101,11 +124,14 @@ export default {
                 state.messages.push({
                   user: t,
                   message: m.message,
+                  image: m.image_uri,
+                  time: m.time,
                 });
               }
             });
           });
         }
+        state.messages = state.messages.sort((a,b) => new Date(a.time).getTime() - new Date(b.time).getTime())
       } catch (err) {
         console.error(err);
       }
@@ -135,10 +161,29 @@ export default {
       event.target.style.height = `${25 + event.target.scrollHeight}px`;
     };
 
+    const handleFileClick = () => document.getElementById('upload-img').click();
+    const addAttachment = async (fileInput) => {
+      const file = fileInput.target.files[0];
+      console.log(file);
+      const response = await AWSCLient.uploadPhoto(
+        store.getters.getCurrentUser.username,
+        file,
+        'image/*',
+      );
+      let message = {
+        user: store.getters.getCurrentUser,
+        image_uri: response,
+      };
+      state.messages.push(message);
+      socket.emit('msg', message);
+    };
+
     return {
       textAreaAdjust,
       state,
       onSubmit,
+      handleFileClick,
+      addAttachment,
     };
   },
   props: {
@@ -188,25 +233,27 @@ export default {
 .chat-input > textarea:focus {
   outline: none;
 }
-.msg-scroll{
-  overflow:hidden;
-  overflow-y:auto;
+.msg-scroll {
+  overflow: hidden;
+  overflow-y: auto;
 }
 
 #messages {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  top:0;
+  top: 0;
   animation: scroll 10s linear 1s infinite;
 }
 @keyframes scroll {
-  100%{top: -360px;}
+  100% {
+    top: -360px;
+  }
 }
 #messages li {
   padding: 5px 10px;
-  border-top: 1px solid #9D989E;
-  border-bottom: 1px solid #9D989E;
+  border-top: 1px solid #9d989e;
+  border-bottom: 1px solid #9d989e;
 }
 .message {
   background-color: lightgray;

@@ -37,6 +37,12 @@ const routes = [
       ),
     props: (route) => ({ server_code: route.query.server_code }),
   },
+  {
+    path: '/private-chat',
+    name: 'Private-Chat',
+    component: () => import(/* webpackChunkName: 'privateChat' */ '../views/AdminPrivateChat.vue'),
+    props: (route) => ({server_code: route.query.server_code, server_room: route.query.server_room})
+  }
 ];
 
 const router = createRouter({

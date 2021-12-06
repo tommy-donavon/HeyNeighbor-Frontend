@@ -9,6 +9,7 @@ class S3Client {
           secretAccessKey: process.env.VUE_APP_AWS_SECRET_KEY,
         },
       });
+      S3Client.instance.config.region = 'us-east-2'
     }
 
     // return S3Client.instance;
@@ -23,14 +24,12 @@ class S3Client {
       Key: `profiles/${username}_${Date.now()}`,
       Body: file,
     };
-    const upLoadData = S3Client.instance.upload(params, (err, data) => {
-      if (err) console.error(err);
-      if (data) {
-        return data.Location;
-      }
-    });
-    return upLoadData;
-    // console.log(upLoadData)
+    try{
+      const uploadData = await S3Client.instance.upload(params).promise()
+      return uploadData.Location
+    }catch(err){
+      console.error(err)
+    }
   };
 }
 

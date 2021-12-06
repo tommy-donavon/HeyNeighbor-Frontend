@@ -8,11 +8,9 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@vuelidate/core": "^2.0.0-alpha.29",
-    "@vuelidate/validators": "^2.0.0-alpha.24",
     "aws-sdk": "^2.1001.0",
-    "cloudinary-vue": "^1.2.3",
     "core-js": "^3.6.5",
+    "cropperjs": "^1.5.12",
     "primeicons": "^4.1.0",
     "primevue": "^3.7.2",
     "socket.io-client": "^4.2.0",

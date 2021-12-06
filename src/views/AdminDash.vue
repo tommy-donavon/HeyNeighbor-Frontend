@@ -10,6 +10,18 @@
       <Button @click="gotoMaintenancePage" label="Manage Maintenance Request" />
     </template>
     <template #right>
+      <Button label="Get Code" @click="() => state.viewServerCode = !state.viewServerCode" />
+      <Dialog header="Server Code"
+        v-model:visible="state.viewServerCode"
+        style="width:fit-content;">
+      {{state.currentProperty['server_code']}}
+      </Dialog>
+      <Button label="Create Property" @click="()=> state.viewPropertyForm = !state.viewPropertyForm"/>
+      <Dialog header="Create Property"
+        v-model:visible="state.viewPropertyForm"
+        style="width:fit-content;">
+        <create-property/>
+      </Dialog>
       <Dropdown
         v-if="state.selectedProperty"
         v-model="state.selectedProperty"
@@ -25,12 +37,15 @@
       <Button label="Log out" @click="onLogout" />
     </template>
   </Toolbar>
+  <tenant-table :tenants="state.tenants" :server_code="state.currentProperty.server_code" />
 </template>
 
 <script>
 import { reactive, watchEffect } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import TenantTable from '../components/TenantTable.vue'
+import CreateProperty from '../components/CreateProperty.vue'
 
 export default {
   name: 'AdminDash',
@@ -44,7 +59,10 @@ export default {
       properties: properties,
       selectedProperty:
         properties[0] === undefined ? '' : properties[0].property_name,
-      currentProperty: {}
+      currentProperty: {server_code:''},
+      tenants: [],
+      viewPropertyForm: false,
+      viewServerCode: false,
     });
     const propOptions = state.properties.map((p) => p.property_name);
     const onLogout = () => {
@@ -61,12 +79,17 @@ export default {
 
     watchEffect(() => {
       state.currentProperty = state.properties.filter(p => p.property_name === state.selectedProperty)[0]
+      state.tenants = state.currentProperty.tenants
     })
 
 
 
     return { state, propOptions, onLogout, gotoMaintenancePage };
   },
+  components:{
+    TenantTable,
+    CreateProperty
+  }
 };
 </script>
 

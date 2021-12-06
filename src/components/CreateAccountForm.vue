@@ -2,7 +2,8 @@
   <Toast />
   <Toast position="top-center" group="tc" />
   <div class="parent-form">
-    <div class="p-float-label">
+    <div class="form-left">
+      <div class="p-float-label">
       <InputText
         id="username"
         v-model="state.username.value"
@@ -85,7 +86,9 @@
     <small v-if="state.email.isInvalid" class="p-error"
       >Please Enter A Valid Email</small
     >
-    <div class="account-types">
+    </div>
+    <div class="form-right">
+      <div class="account-types">
       <div class="p-field-radiobutton">
         <RadioButton
           name="accountTenant"
@@ -99,7 +102,16 @@
         <label for="accountAdmin"> Property Manager</label>
       </div>
     </div>
-    <Button label="Submit" @click="submit" />
+    <div v-if="accountType === 'Admin'">
+      <Button label="Connect PayPal" @click="onBoard"  />
+      
+    </div>
+    <picture-cropper :firstName="state.first_name.value" :lastName="state.last_name.value" @selectedPicture="processPicture"/>
+    </div>
+  </div>
+  <div style="display:flex;justify-content:center; margin-top:5px;">
+
+    <Button label="Submit" @click="submit"  />
   </div>
 </template>
 
@@ -107,12 +119,16 @@
 import { reactive, watchEffect, ref } from 'vue';
 import { useToast } from 'primevue/usetoast';
 import UserClient from '../clients/userClient';
+import PayPalClient from '../clients/paypalClient'
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
+import PictureCropper from '../components/PictureCropper.vue'
+import AWSCLient from '../clients/awsBucketClient';
+
 
 export default {
   name: 'CreateAccountForm',
-  setup() {
+   setup() {
     const state = reactive({
       username: { value: '', isInvalid: true, focused: false },
       password: { value: '', isInvalid: true, focused: false },
@@ -122,6 +138,7 @@ export default {
       account_type: { value: 1 },
     });
     const accountType = ref('Tenant');
+    const pictureFile = ref({})
     const toast = useToast();
     const store = useStore();
     const router = useRouter();
@@ -163,7 +180,15 @@ export default {
         }
         userInfo[prop] = state[prop].value;
       }
+
       try {
+        const response = await AWSCLient.uploadPhoto(
+        state.username.value,
+        pictureFile,
+        'image/*',
+      );
+      userInfo.profile_uri = response
+      
         await UserClient.createUserAccount(userInfo);
         await store.dispatch('setCurrentToken', {
           username: state.username.value,
@@ -193,12 +218,26 @@ export default {
         });
       }
     };
+
+    const onBoard = async () => {
+     const link = await PayPalClient.getActionUrl();
+      window.open(link,"test", "popup")
+    }
+    const processPicture = (e) => {
+      console.log(e)
+      pictureFile.value = e;
+    }
     return {
       state,
       accountType,
       submit,
+      onBoard,
+      processPicture
     };
   },
+  components:{
+    PictureCropper
+  }
 };
 </script>
 
@@ -216,10 +255,21 @@ export default {
 
 .parent-form {
   display: flex;
-  flex-flow: column wrap;
+  flex-flow: row wrap;
   justify-content: center;
   align-items: center;
   align-content: space-around;
   gap: 25px;
+
+  .form-left {
+    display: flex;
+    flex-flow: column wrap;
+    gap: 25px;
+  }
+  .form-right{
+    display: flex;
+    flex-flow: column nowrap;
+    gap:25px;
+  }
 }
 </style>

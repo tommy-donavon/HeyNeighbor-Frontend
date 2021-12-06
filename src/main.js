@@ -25,6 +25,12 @@ import AvatarGroup from 'primevue/avatargroup';
 import SpeedDial from 'primevue/speeddial'
 import RadioButton from 'primevue/radiobutton'
 import Divider from 'primevue/divider'
+import VirtualScroller from 'primevue/virtualscroller'
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup'; 
+import InputNumber from 'primevue/inputnumber'
+import Image from 'primevue/image'
 
 const app = createApp(App);
 
@@ -54,4 +60,10 @@ app
   .component('SpeedDial', SpeedDial)
   .component('RadioButton', RadioButton)
   .component('Divider', Divider)
+  .component('VirtualScroller', VirtualScroller)
+  .component('DataTable',DataTable)
+  .component('Column', Column)
+  .component('ColumnGroup', ColumnGroup)
+  .component('InputNumber',InputNumber )
+  .component('Image', Image)
   .mount('#app');

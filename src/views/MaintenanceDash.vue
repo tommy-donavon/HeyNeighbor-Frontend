@@ -8,13 +8,13 @@
       />
       <Button
         label="New Request"
-        @click="() => (state.formVisable = !state.formVisable)"
+        @click="() => (state.formVisible = !state.formVisible)"
       />
     </template>
   </Toolbar>
   <Dialog
     header="Please enter your information below"
-    v-model:visible="state.formVisable"
+    v-model:visible="state.formVisible"
     style="width:fit-content;"
   >
     <MaintenanceForm :server_code="state.server_code" />
@@ -31,6 +31,27 @@
         :key="index"
         style="width:15rem;"
       >
+      <template #header>
+          <i
+            class="pi pi-times"
+            style="float: right;margin:10px;"
+          ></i>
+          <Dialog
+            header="Please Provided Rejection Reason Below"
+            style="width:fit-content;"
+            v-model:visible="state.deleteVisible"
+          >
+            
+              <div style="display:flex;flex-direction:column;gap:15px;">
+                <div class="p-float-label">
+                  <InputText id="rejectReason" />
+                  <label for="rejectReason">Reason</label>
+                </div>
+                <Button label="Submit" />
+              </div>
+  
+          </Dialog>
+        </template>
         <template #title>
           {{ req.title }}
         </template>
@@ -99,13 +120,15 @@ export default {
     const router = useRouter();
     const store = useStore();
     const state = reactive({
-      formVisable: false,
+      formVisible: false,
       server_code: server_code.value,
       mainRequest: [],
       toDos: [],
       progress: [],
       complete: [],
       severity: ['Low', 'Moderate', 'Critical'],
+      deleteVisible: false,
+
     });
 
     onBeforeMount(async () => {
@@ -190,7 +213,7 @@ export default {
     display: flex;
     flex-flow: row wrap;
     gap: 10px;
-    justify-content: space-evenly;
+    // justify-content: space-evenly;
     align-content: center;
   }
 }

@@ -44,7 +44,7 @@
         <div>
           <img
             src="../assets/img/landing_chi.jpg"
-            style="height:100vh;width:100vw;"
+            style="height:86.18vh;width:100vw;"
           />
         </div>
       </div>

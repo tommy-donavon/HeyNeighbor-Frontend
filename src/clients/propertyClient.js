@@ -9,29 +9,46 @@ export default class PropertyClient {
         accept: 'application/json',
       },
     });
-    const data = await response.json()
+    const data = await response.json();
     if (!response.ok) {
       const error = new Error(data.message || `Failed to get properties`);
       error.response = data;
       throw error;
     }
-    return data
+    return data;
   };
 
   static addTenantToProperty = async (server_code, token) => {
     const response = await fetch(`${baseURL}tenant`, {
-      method:"POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({server_code: server_code})
-    })
+      body: JSON.stringify({ server_code: server_code }),
+    });
     if (!response.ok) {
-      const data = await response.json()
+      const data = await response.json();
       const error = new Error(data.message || `Failed to get properties`);
       error.response = data;
       throw error;
     }
-  }
+  };
+
+  static updateTenantInProperty = async (updateBody, token) => {
+    const response = await fetch(`${baseURL}tenant`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateBody),
+    });
+    if (!response.ok) {
+      const data = await response.json();
+      const error = new Error(data.message || `Failed to get properties`);
+      error.response = data;
+      throw error;
+    }
+  };
 }

@@ -10,12 +10,15 @@
   </Toolbar>
   <Dialog
     header="Please enter your information below"
-    v-model:visible="state.formVisable"
+    v-model:visible="state.formVisible"
     style="width:fit-content;"
   >
     <MaintenanceForm :server_code="state.server_code" />
   </Dialog>
-  <div v-if="state.toDos.length || state.progress.length || state.complete.length" class="main-container">
+  <div
+    v-if="state.toDos.length || state.progress.length || state.complete.length"
+    class="main-container"
+  >
     <div class="spacer">
       <hr />
       <span>Requested</span>
@@ -27,12 +30,41 @@
         :key="index"
         style="width:15rem;"
       >
+        <template #header>
+          <i
+            class="pi pi-times"
+            style="float: right;margin:10px;"
+            @click="
+              () => (state.rejectionFormVisible = !state.rejectionFormVisible)
+            "
+          ></i>
+          <Dialog
+            header="Please Provided Rejection Reason Below"
+            style="width:fit-content;"
+            v-model:visible="state.rejectionFormVisible"
+          >
+            <div style="display:flex;flex-direction:column;gap:15px;">
+              <div class="p-float-label">
+                <InputText id="rejectReason" />
+                <label for="rejectReason">Reason</label>
+              </div>
+              <Button label="Submit" />
+            </div>
+          </Dialog>
+          <!-- <Image v-if="req.image_uri" :src="req.image_uri" imageStyle="object-fit:cover;object-position: 0px 120px;" preview /> -->
+        </template>
         <template #title>
           {{ req.title }}
         </template>
         <template #content>
-          {{ req.description }}<br /><br />Severity:
+          User: {{ req.tenant }}<br />
+          Unit#: {{ req.unit_number }}<br />
+          Description: {{ req.description }}<br />Severity:
           {{ state.severity[req.severity] }}
+          <div v-if="req.image_uri" style="margin-top:5px;">
+            <!-- <Button label="Show Image" @click="() => state.showImage =!state.showImage"  />
+            <Image :image="req.image_uri" :v-show="state.showImage" /> -->
+          </div>
         </template>
         <template #footer>
           <Button @click="moveCard('toDos', 'progress', req)" label="Start" />
@@ -54,8 +86,13 @@
           {{ req.title }}
         </template>
         <template #content>
-          {{ req.description }}<br /><br />Severity:
-          {{ state.severity[req.severity] }}
+          User: {{ req.tenant }}<br />
+          Unit#: {{ req.unit_number }}<br />
+          Description: {{ req.description }}<br />
+          Severity: {{ state.severity[req.severity] }}<br />
+          <div v-if="req.image_uri">
+            <Button label="Show Image" />
+          </div>
         </template>
         <template #footer>
           <Button
@@ -80,14 +117,19 @@
           {{ req.title }}
         </template>
         <template #content>
-          {{ req.description }}<br /><br />Severity:
+          User: {{ req.tenant }}<br />
+          Unit#: {{ req.unit_number }}<br />
+          Description: {{ req.description }}<br />Severity:
           {{ state.severity[req.severity] }}
+          <div v-if="req.image_uri">
+            <Button label="Show Image" />
+          </div>
         </template>
       </Card>
     </div>
   </div>
-  <div v-else>
-    <h3>No request have been made on this property</h3>
+  <div v-else style="display:flex; justify-content:center; align-items:center;">
+    <h3 style="color:white;">No request have been made on this property</h3>
   </div>
 </template>
 
@@ -104,13 +146,15 @@ export default {
     const router = useRouter();
     const store = useStore();
     const state = reactive({
-      formVisable: false,
+      formVisible: false,
+      rejectionFormVisible: false,
       server_code: server_code.value,
       mainRequest: [],
       toDos: [],
       progress: [],
       complete: [],
       severity: ['Low', 'Moderate', 'Critical'],
+      showImage: false
     });
 
     onBeforeMount(async () => {
@@ -121,10 +165,17 @@ export default {
           token,
         );
         state.toDos = state.mainRequest.filter(
-          (r) => !r.admin_checked_done && !r.tenant_checked_done && !r.in_progress
+          (r) =>
+            !r.admin_checked_done && !r.tenant_checked_done && !r.in_progress,
         );
-        state.progress = state.mainRequest.filter((r) => !r.admin_checked_done && !r.tenant_checked_done && r.in_progress)
-        state.complete = state.mainRequest.filter((r) => r.admin_checked_done && !r.tenant_checked_done && r.in_progress)
+        state.progress = state.mainRequest.filter(
+          (r) =>
+            !r.admin_checked_done && !r.tenant_checked_done && r.in_progress,
+        );
+        state.complete = state.mainRequest.filter(
+          (r) =>
+            r.admin_checked_done && !r.tenant_checked_done && r.in_progress,
+        );
       } catch (err) {
         console.error(err);
       }
@@ -133,11 +184,11 @@ export default {
     const moveCard = async (from, to, request) => {
       state[to].push(request);
       state[from] = state[from].filter((r) => r.ID !== request.ID);
-        if(request.in_progress){
-          request.admin_checked_done = true
-        }else{
-          request.in_progress = true;
-        }
+      if (request.in_progress) {
+        request.admin_checked_done = true;
+      } else {
+        request.in_progress = true;
+      }
       const token = store.getters.getCurrentToken;
 
       try {
@@ -194,7 +245,7 @@ export default {
     display: flex;
     flex-flow: row wrap;
     gap: 10px;
-    justify-content: space-evenly;
+    // justify-content: space-evenly;
     align-content: center;
   }
 }
