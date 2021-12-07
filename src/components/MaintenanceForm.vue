@@ -30,7 +30,7 @@ import { reactive, toRefs,ref, watchEffect } from 'vue';
 import client from '../clients/maintenanceClient';
 import { useStore } from 'vuex';
 export default {
-  name: 'MaintainceForm',
+  name: 'MaintenanceForm',
   setup(props) {
     const store = useStore();
     const { server_code } = toRefs(props);
@@ -39,6 +39,7 @@ export default {
       description: '',
       severity: 0,
       property_code: server_code,
+      unit_number: 0
     });
 
     const selectedSeverity = ref('Low')
@@ -71,6 +72,9 @@ export default {
       type: String,
       required: true,
     },
+    // unit_number:{
+    //   type:Number
+    // }
   },
 };
 </script>

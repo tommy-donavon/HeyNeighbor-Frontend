@@ -5,8 +5,9 @@
       <div class="virtualscroller-demo">
         <div class="p-d-flex p-dir-col p-mr-3 p-mt-3">
           <VirtualScroller :items="state.availableUsers" :itemSize="state.availableUsers.length-1">
-            <template v-slot:item="{ item }">
-              <div
+            <template v-slot:item="{ item }" >
+              <div style="background-color:lightgray;border-radius:2px;padding:5px; margin-top:15px; display:flex;align-content:center;">
+                <div
                 @click="privateChat(item.username)"
               >
                 <Avatar
@@ -17,7 +18,12 @@
                   "
                   style="color:black;user-select:none;"
                 />
+                <Avatar
+                  v-else
+                  :image="item.profile_uri"
+                />
                 {{ item.username }}
+              </div>
               </div>
             </template>
           </VirtualScroller>
@@ -25,7 +31,7 @@
       </div>
     </div>
     <div v-if="state.isMounted" class="chat-window">
-      <Chat :serverName="state.server_code" :room="state.server_room" />
+      <Chat :serverName="state.server_code" :room="state.server_room" :tenants="property.tenants" />
     </div>
   </div>
 </template>
@@ -66,7 +72,7 @@ export default {
     onMounted(() => (state.isMounted = true));
     const privateChat = (username) => state.server_room = `${store.getters.getCurrentUser.username}:${username}`
 
-    return { state, privateChat };
+    return { state, privateChat, property };
   },
   components: {
     Chat,
@@ -93,31 +99,33 @@ export default {
 }
 
 .virtualscroller-demo {
-  background-color: lightgray;
+  background-color: transparent;
+  margin-top: 15px;
   ::v-deep(.p-virtualscroller) {
     width: auto;
-    height: 100px;
+    height: 250px;
     
-    border: 1px solid var(--surface-d);
 
     .scroll-item {
-      background-color: var(--surface-a);
+      background-color: lightgray;
       display: flex;
       align-items: center;
     }
 
     .custom-scroll-item {
+      background-color: lightgray;
       flex-direction: column;
       align-items: stretch;
     }
 
-    .odd {
-      background-color: var(--surface-b);
-    }
+    // .odd {
+    //   background-color: var(--surface-b);
+    // }
   }
 
   ::v-deep(.p-horizontal-scroll) {
     .p-virtualscroller-content {
+      background-color: lightgray;
       display: flex;
       flex-direction: row;
     }

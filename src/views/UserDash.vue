@@ -22,7 +22,7 @@
         @show="lookupRent"
       >
         <h3>Balance: {{ state.userBalance }}</h3>
-        <Button label="pay now" />
+        <Button label="Pay Now" @click="openPayPal" />
       </Dialog>
       <Button label="New Service Request" @click="goToMaintenanceDash" />
     </template>
@@ -86,6 +86,7 @@ import { useStore } from 'vuex';
 import { reactive, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import ChatWindow from './ChatWindow.vue';
+import PayPalClient from '../clients/paypalClient'
 export default {
   name: 'UserDash',
   setup() {
@@ -144,6 +145,11 @@ export default {
     const submitCode = async (server_code) =>
       await store.dispatch('addTenantToProperty', server_code);
 
+    const openPayPal = async () => {
+      const link = await PayPalClient.getActionUrl();
+      window.open(link,"test", "popup")
+    }
+
     return {
       state,
       propOptions,
@@ -152,6 +158,7 @@ export default {
       submitCode,
       goToMaintenanceDash,
       lookupRent,
+      openPayPal
     };
   },
   components: {

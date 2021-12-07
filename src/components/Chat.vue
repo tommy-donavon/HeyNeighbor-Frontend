@@ -50,6 +50,8 @@
         v-on:keyup.enter="onSubmit"
         v-model="state.textInput"
       />
+      <div class="ping-users">
+      </div>
     </div>
   </div>
 </template>
@@ -64,7 +66,6 @@ export default {
   name: 'Chat',
   setup(props) {
     const { serverName, room } = toRefs(props);
-
     const state = reactive({
       textInput: '',
       messages: [],
@@ -72,6 +73,7 @@ export default {
     });
     const store = useStore();
     let pstMsg = [];
+ 
     onBeforeMount(async () => {
       try {
         state.messages = [];
@@ -159,6 +161,7 @@ export default {
     const textAreaAdjust = (event) => {
       event.target.style.height = '1px';
       event.target.style.height = `${25 + event.target.scrollHeight}px`;
+
     };
 
     const handleFileClick = () => document.getElementById('upload-img').click();

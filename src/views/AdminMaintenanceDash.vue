@@ -62,8 +62,6 @@
           Description: {{ req.description }}<br />Severity:
           {{ state.severity[req.severity] }}
           <div v-if="req.image_uri" style="margin-top:5px;">
-            <!-- <Button label="Show Image" @click="() => state.showImage =!state.showImage"  />
-            <Image :image="req.image_uri" :v-show="state.showImage" /> -->
           </div>
         </template>
         <template #footer>

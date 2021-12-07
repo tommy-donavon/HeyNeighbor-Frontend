@@ -140,40 +140,25 @@
         dataType="date"
         style="min-width: 8rem"
       >
+      <template #body={data}>
+        <div>
+          {{data.rent_agreement.last_date_paid}}
+          <!-- {{formatDate(data.rent_agreement.last_date_paid)}} -->
+          <!-- {{new Date(data.rent_agreement.last_date_paid).getMonth()}}/{{new Date(data.rent_agreement.last_date_paid).getDay()}}/{{new Date(data.rent_agreement.last_date_paid).getFullYear()}} -->
+        </div>
+      </template>
       </Column>
-      <Column
+      <!-- <Column
         field="status"
         header="Status"
         sortable
         :filterMenuStyle="{ width: '14rem' }"
         style="min-width: 10rem"
       >
-        <template #body="{data}">
-          <span :class="'customer-badge status-' + data.status">{{
-            data.status
-          }}</span>
-        </template>
-        <template #filter="{filterModel}">
-          <Dropdown
-            v-model="filterModel.value"
-            :options="statuses"
-            placeholder="Any"
-            class="p-column-filter"
-            :showClear="true"
-          >
-            <template #value="slotProps">
-              <span :class="'customer-badge status-' + slotProps.value">{{
-                slotProps.value
-              }}</span>
-            </template>
-            <template #option="slotProps">
-              <span :class="'customer-badge status-' + slotProps.option">{{
-                slotProps.option
-              }}</span>
-            </template>
-          </Dropdown>
-        </template>
-      </Column>
+      <template #body="{data}" >
+        <div v-if="new Date('12/1/2021').getDate() - new Date(data.rent_agreement.last_date_paid).getDate() > 25">asdf</div>
+      </template>
+      </Column> -->
       <Column
         headerStyle="width: 4rem; text-align: center"
         bodyStyle="text-align: center; overflow: visible"
@@ -263,9 +248,6 @@ export default {
 
     }
     const goToPrivateChat = (username) => {
-      console.log(username)
-      console.log(router)
-      console.log(server_code.value)
       let room = `${store.getters.getCurrentUser.username}:${username}`
       router.push({
         name: 'Private-Chat',

@@ -17,7 +17,7 @@
     v-model:visible="state.formVisible"
     style="width:fit-content;"
   >
-    <MaintenanceForm :server_code="state.server_code" />
+    <MaintenanceForm :server_code="state.server_code"/>
   </Dialog>
   <div class="main-container">
     <div class="spacer">
@@ -36,7 +36,7 @@
             class="pi pi-times"
             style="float: right;margin:10px;"
           ></i>
-          <Dialog
+          <!-- <Dialog
             header="Please Provided Rejection Reason Below"
             style="width:fit-content;"
             v-model:visible="state.deleteVisible"
@@ -48,15 +48,17 @@
                   <label for="rejectReason">Reason</label>
                 </div>
                 <Button label="Submit" />
-              </div>
+              </div> -->
   
-          </Dialog>
+          <!-- </Dialog> -->
         </template>
         <template #title>
           {{ req.title }}
         </template>
         <template #content>
-          {{ req.description }}<br /><br />Severity:
+          User: {{ req.tenant }}<br />
+          <!-- Unit#: {{ req.unit_number }}<br /> -->
+          Description: {{ req.description }}<br />Severity:
           {{ state.severity[req.severity] }}
         </template>
       </Card>
@@ -72,11 +74,19 @@
         :key="index"
         style="width:15rem;"
       >
+      <template #header>
+         <i
+            class="pi pi-times"
+            style="float: right;margin:10px;"
+          ></i>
+      </template>
         <template #title>
           {{ req.title }}
         </template>
         <template #content>
-          {{ req.description }}<br /><br />Severity:
+          User: {{ req.tenant }}<br />
+          <!-- Unit#: {{ req.unit_number }}<br /> -->
+          Description: {{ req.description }}<br />Severity:
           {{ state.severity[req.severity] }}
         </template>
       </Card>
@@ -96,11 +106,13 @@
           {{ req.title }}
         </template>
         <template #content>
-          {{ req.description }}<br /><br />Severity:
+          User: {{ req.tenant }}<br />
+          <!-- Unit#: {{ req.unit_number }}<br /> -->
+          Description: {{ req.description }}<br />Severity:
           {{ state.severity[req.severity] }}
         </template>
         <template #footer>
-          <Button @click="confirmDone(req)" label="Confrim" />
+          <Button @click="confirmDone(req)" label="Confirm" />
         </template>
       </Card>
     </div>

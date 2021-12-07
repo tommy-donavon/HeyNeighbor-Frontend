@@ -31,6 +31,7 @@ import Column from 'primevue/column';
 import ColumnGroup from 'primevue/columngroup'; 
 import InputNumber from 'primevue/inputnumber'
 import Image from 'primevue/image'
+import ContextMenu from 'primevue/contextmenu'
 
 const app = createApp(App);
 
@@ -66,4 +67,5 @@ app
   .component('ColumnGroup', ColumnGroup)
   .component('InputNumber',InputNumber )
   .component('Image', Image)
+  .component('ContextMenu', ContextMenu)
   .mount('#app');

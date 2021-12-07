@@ -6,6 +6,7 @@
         :label="state.user.username.charAt(0).toUpperCase()"
         style="color:black;user-select:none;"
       />
+      <Avatar v-else :image="state.user.profile_uri" />
       <h3 style="color:white;">{{ state.user.username }}</h3>
       <Button @click="gotoMaintenancePage" label="Manage Maintenance Request" />
     </template>
